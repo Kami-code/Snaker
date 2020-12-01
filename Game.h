@@ -38,29 +38,36 @@ private:
     LinkList<Point> bodyList;
     int direction = 4;
     int trySetDirection = 4;
+    int refreshTime = 200;
+    int life = 9999999999;
 public:
     int errorStatus = 0;
-    bool needInitFlag = true;
     LinkList<Point> &getBody();
     LinkList<Point> *getBodyAddr();
     int getDirection();
     int getTryDirection();
+    int getRefreshTime();
+    int getLife();
     void setDirection(int);
     void setTryDirection(int);
+    void setRefreshTime(int);
+    void setLife(int);
     Snake();
     Snake(Point);
     Point position();
     void appendBody(Point);
     void move(Point);
-    void clear();
+    void move(Point, int, int);
+    void clear(Point);
 };
 
 class Game{
 public:
     Background background;
-    LinkList<Snake> snakeList;
+    LinkList<Snake*> snakeList;
     bool showFigure = true;
     bool showAudio = true;
+    bool penetrate = true;
     int snakeMove(Snake*, Point);
     void reInit();
 };

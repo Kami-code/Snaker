@@ -1,16 +1,17 @@
+#pragma once
+
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QPushButton>
 #include <QtCore/QDebug>
-
-//#include "ui_mainwidget.h"
-
 #include "GameOverWindow.h"
 #include  "GameWindow.h"
 #include "SettingWindow.h"
 #include <QSound>
+#include "Resource.h"
+
 
 class MainWidget : public QWidget
 {
@@ -43,6 +44,7 @@ private:
     GameWindow * sw1;
     GameOverWindow *sw2;
     SettingWindow *sw3;
+
 };
 
 #endif // MAINWIDGET_H

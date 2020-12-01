@@ -1,33 +1,36 @@
 <RCC>
-    <qresource prefix="/image">
-        <file>title.jpg</file>
-        <file>gameover.jpg</file>
-        <file>grass.png</file>
-        <file>head1.png</file>
-        <file>head2.png</file>
-        <file>title1.jpg</file>
-        <file>title2.jpg</file>
-        <file>title3.jpg</file>
-        <file>title4.jpg</file>
-        <file>title5.jpg</file>
-        <file>title6.jpg</file>
-        <file>title7.jpg</file>
-        <file>title8.jpg</file>
-        <file>title9.jpg</file>
-        <file>title10.jpg</file>
-        <file>title11.jpg</file>
-        <file>title12.jpg</file>
-        <file>title13.jpg</file>
-        <file>head3.png</file>
-        <file>head4.png</file>
-        <file>head5.png</file>
+    <qresource prefix="/audio">
+        <file>audio/death.wav</file>
+        <file>audio/desktop.wav</file>
+        <file>audio/eatnormal.wav</file>
+        <file>audio/failure.wav</file>
+        <file>audio/failure2.wav</file>
+        <file>audio/fight.wav</file>
     </qresource>
-    <qresource prefix="/sound">
-        <file>eatnormal.wav</file>
-        <file>death.wav</file>
-        <file>desktop.wav</file>
-        <file>failure.wav</file>
-        <file>failure2.wav</file>
-        <file>fight.wav</file>
+    <qresource prefix="/image">
+        <file>image/gameover.jpg</file>
+        <file>image/grass.png</file>
+        <file>image/head1.png</file>
+        <file>image/head2.png</file>
+        <file>image/head3.png</file>
+        <file>image/head4.png</file>
+        <file>image/head5.png</file>
+        <file>image/head6.png</file>
+        <file>image/head7.png</file>
+        <file>image/head8.png</file>
+        <file>image/title.jpg</file>
+        <file>image/title1.jpg</file>
+        <file>image/title2.jpg</file>
+        <file>image/title3.jpg</file>
+        <file>image/title4.jpg</file>
+        <file>image/title5.jpg</file>
+        <file>image/title6.jpg</file>
+        <file>image/title7.jpg</file>
+        <file>image/title8.jpg</file>
+        <file>image/title9.jpg</file>
+        <file>image/title10.jpg</file>
+        <file>image/title11.jpg</file>
+        <file>image/title12.jpg</file>
+        <file>image/title13.jpg</file>
     </qresource>
 </RCC>

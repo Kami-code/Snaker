@@ -14,6 +14,12 @@ public:
     Point();
     Point(int x_, int y_):x(x_), y(y_){}
     Point (QPoint a):x(a.x()), y(a.y()){}
+    Point move(Point movePos, int width, int height) {
+        int tarx= x + movePos.x, tary = y + movePos.y;
+        if (tarx < 0) tarx += width;
+        if (tary < 0) tary += height;
+        return Point(tarx % width, tary % height);
+    }
     Point move(Point movePos) {
         return Point(x + movePos.x, y + movePos.y);
     }
@@ -50,8 +56,8 @@ public:
     void Delete(int);
     void Show() const;
     void Show(int, int) const;
-    int getCurrentLength();
-
+    int getCurrentLength() const;
+    void setCurrentLength(int);
 };
 
 //模板类的实现要写在.h文件中
@@ -63,8 +69,13 @@ LinkList<T>::LinkList() {
 }
 
 template<typename T>
-int LinkList<T>::getCurrentLength() {
+int LinkList<T>::getCurrentLength() const{
     return currentLength;
+}
+
+template<typename T>
+void LinkList<T>::setCurrentLength(int d){
+    currentLength = d;
 }
 
 template<typename T>

@@ -1,7 +1,7 @@
 #include "SettingWindow.h"
 #include "GameWindow.h"
 #include <QSound>
-#include "game.h"
+#include "Game.h"
 #include <QSlider>
 
 extern Game game;
@@ -52,8 +52,8 @@ SettingWindow::SettingWindow(QWidget *parent)
 
 void SettingWindow::SetSnakes(int nums) {
     while (nums > game.snakeList.getCurrentLength()) {
-        Snake a(Point(1,1));
-        game.snakeList.Insert(a);
+        Snake* aa = new Snake(Point(1,1));
+        game.snakeList.Insert(aa);
     }
     while (nums < game.snakeList.getCurrentLength()) game.snakeList.Delete();
 }

@@ -47,30 +47,31 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-
+#pragma once
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 
 #include <QWidget>
 #include <QtWidgets/QPushButton>
-#include "game.h"
+#include "Game.h"
 #include "LinkList.h"
+#include "Resource.h"
 
 
 class WindowMap
 {
 private:
-    int size;
-    int left;
-    int up;
-    int right;
-    int down;
-    int width;
-    int height;
-    int unitWidth;
-    int unitHeight;
-    int gameWidth;
-    int gameHeight;
+    float size;
+    float left;
+    float up;
+    float right;
+    float down;
+    float width;
+    float height;
+    float unitWidth;
+    float unitHeight;
+    float gameWidth;
+    float gameHeight;
     Game *gameAddr;
 public:
     WindowMap();
@@ -78,6 +79,7 @@ public:
     void init(Game *, Point, Point);
     void draw( QPainter *painter);
     void leftClicked(Point);
+    Resource resource;
 };
 
 class GameWindow : public QWidget

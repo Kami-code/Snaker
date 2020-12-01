@@ -11,7 +11,7 @@ GameOverWindow::GameOverWindow(QWidget *parent)
     this->setWindowTitle("gameover");
     this->resize(QSize(640, 480));
     QPalette pal = this->palette();
-    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/gameover.jpg")));
+    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/gameover.jpg")));
     setPalette(pal);
     bt = new QPushButton(this);
     bt->move(QPoint(300, 460));

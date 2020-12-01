@@ -1,17 +1,17 @@
 #include "DesktopWindow.h"
 #include "GameWindow.h"
-#include "game.h"
+#include "Game.h"
 #include <QSound>
 
 extern Game game;
 
 
 MainWidget::MainWidget(QWidget *parent)
-    : QWidget(parent), desktopSound(":/sound/desktop.wav"), gameWindowSound(":/sound/fight.wav")
+    : QWidget(parent), desktopSound(":/audio/audio/desktop.wav"), gameWindowSound(":/audio/audio/fight.wav")
 {
     if(game.showAudio)desktopSound.play();
     QPalette pal = this->palette();
-    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/title.jpg")));
+    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/title.jpg")));
     setPalette(pal);
 
     this->setParent(parent);

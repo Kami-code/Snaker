@@ -49,12 +49,13 @@
 ****************************************************************************/
 
 #include "GameWindow.h"
-#include "game.h"
+#include "Game.h"
 #include "LinkList.h"
 #include <QPainter>
 #include <QTime>
 #include <QTimer>
 #include <QSound>
+#include <Resource.h>
 
 extern Game game;
 
@@ -84,20 +85,15 @@ void WindowMap::draw(QPainter *painter) {
     (*painter).setRenderHint(QPainter::Antialiasing);
     (*painter).translate(left, up);
     //painter.scale(side / 200.0, side / 200.0);
-    QPixmap food, image1, image2, image3;
-    food.load(":/image/head2.png");
-    image1.load(":/image/head4.png");
-    image2.load(":/image/head1.png");
-    image3.load(":/image/head3.png");
     for (int i = 0; i < gameWidth; i ++) {
         for (int j = 0; j < gameHeight; j ++) {
-            int status = (*gameAddr).background.getGround()[i][j];
+            int status = (*gameAddr).background.getGround()[i][j] % 100;
             if (status == 0) {
                 (*painter).setPen(QColor(255,255,255,255));
                 (*painter).setBrush(Qt::NoBrush);
                 (*painter).drawRect(unitWidth * i,unitHeight * j,unitWidth , unitHeight);
             }
-            else if (status == 1) {
+            else {
                 if (!game.showFigure) {
                     (*painter).setPen(QColor(222,222,222,128));
                     (*painter).setBrush(QColor(0,255,255,128));
@@ -106,7 +102,7 @@ void WindowMap::draw(QPainter *painter) {
                 else {
                     (*painter).setPen(Qt::NoPen);
                     (*painter).setBrush(QColor(0,255,255,128));
-                    (*painter).drawPixmap(unitWidth * i,unitHeight * j,unitWidth , unitHeight, food);
+                    (*painter).drawPixmap(unitWidth * i,unitHeight * j,unitWidth , unitHeight, resource.food[status]);
                 }
             }
         }
@@ -114,18 +110,17 @@ void WindowMap::draw(QPainter *painter) {
     (*painter).setPen(Qt::NoPen);
     (*painter).setBrush(QColor(255,0,0,128));
 
-    ListNode<Snake> *head = game.snakeList.head->next;
+    //绘制蛇
+    ListNode<Snake*> *head = game.snakeList.head->next;
     int cnt = 0;
     while (head != NULL) {
-        ListNode<Point> *header = (head->data).getBody().head->next;
+        ListNode<Point> *header = (*head->data).getBody().head->next;
         while (header != NULL) {
             if (!game.showFigure) {
                 (*painter).drawRect(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth,unitHeight);
             }
             else {
-                if (cnt == 1)(*painter).drawPixmap(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth , unitHeight, image1);
-                else if (cnt == 2) (*painter).drawPixmap(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth , unitHeight, image2);
-                else (*painter).drawPixmap(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth , unitHeight, image3);
+                (*painter).drawPixmap(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth , unitHeight, resource.character[cnt]);
             }
             header = header->next;
         }
@@ -159,7 +154,7 @@ GameWindow::GameWindow(QWidget *parent)
 {
 
     QPalette pal = this->palette();
-    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/grass.png")));
+    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/grass.png")));
     setPalette(pal);
     this->setParent(parent);
     this->setWindowTitle("游戏界面");
@@ -247,11 +242,11 @@ void GameWindow::keyPressEvent(QKeyEvent * event) {
 
     }
 
-    ListNode<Snake> *head = game.snakeList.head->next;
+    ListNode<Snake*> *head = game.snakeList.head->next;
     int cnt = 1;
     while (head != NULL) {
-        if (direction[min(3, cnt)] != 0)(head->data).setTryDirection(direction[min(3, cnt)]);
-        else (head->data).setTryDirection((head->data).getTryDirection());
+        if (direction[min(3, cnt)] != 0)(*head->data).setTryDirection(direction[min(3, cnt)]);
+        else (*head->data).setTryDirection((*head->data).getTryDirection());
         head = head->next;
         cnt++;
     }
@@ -302,17 +297,23 @@ int onTimeOut(Snake* snake) //定时器事件触发绑定
 }
 
 void GameWindow::timelyAccess() {
-    ListNode<Snake> *head = game.snakeList.head->next;
+    ListNode<Snake*> *head = game.snakeList.head->next;
+
     while (head != NULL) {
-        if (onTimeOut(&(head->data)) < 0){
-            ChangeToGameOverWindow();
-            timer->stop();
-            stopped = true;
-            return;
+        Snake* nowSnakeAddr = &(*head->data);
+        timer->start((*nowSnakeAddr).getRefreshTime());
+        if (onTimeOut(&(*(head->data))) < 0){
+            (*(head->data)).setLife((*head->data).getLife() - 1);
+            if ((*head->data).getLife() <= 0) {
+                ChangeToGameOverWindow();
+                timer->stop();
+                stopped = true;
+                return;
+            }
         }
         head = head->next;
     }
-
+    timer->start();
 
     update();
 }

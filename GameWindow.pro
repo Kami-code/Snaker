@@ -3,18 +3,20 @@ QT+= multimedia
 
 HEADERS       = \
     DesktopWindow.h \
+    Game.h \
     GameOverWindow.h \
     GameWindow.h \
     LinkList.h \
-    SettingWindow.h \
-    game.h
+    Resource.h \
+    SettingWindow.h
 SOURCES       = \
                 DesktopWindow.cpp \
+                Game.cpp \
                 GameOverWindow.cpp \
                 GameWindow.cpp \
                 LinkList.cpp \
+                Resource.cpp \
                 SettingWindow.cpp \
-                game.cpp \
                 main.cpp
 
 QMAKE_PROJECT_NAME = widgets_analogclock

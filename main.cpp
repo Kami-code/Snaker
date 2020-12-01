@@ -51,14 +51,17 @@
 #include <QApplication>
 #include "DesktopWindow.h"
 #include "GameWindow.h"
-#include "game.h"
+#include "Game.h"
+#include "Resource.h"
 
 Game game;
+
 int main(int argc, char *argv[])
 {
-    Snake a (Point(3,3)), b(Point(1,1));
+    Snake *a = new Snake(Point(3,3));
+    //Snake *b = new Snake(Point(2,2));
     game.snakeList.Insert(a);
-    game.snakeList.Insert(b);
+    //game.snakeList.Insert(b);
     QApplication app(argc, argv);
     MainWidget w;
     w.show();

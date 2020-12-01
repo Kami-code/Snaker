@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SUBWIDGET_H
 #define SUBWIDGET_H
 
