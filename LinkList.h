@@ -45,7 +45,7 @@ private:
     int currentLength = 0;
 public:
     ListNode<T>* head = NULL;
-
+    LinkList &operator = (const LinkList&);
     LinkList();
     LinkList(ListNode<T>* p):head(p){}
     ListNode<T>* Find(int) const;
@@ -61,9 +61,19 @@ public:
 };
 
 //模板类的实现要写在.h文件中
+
+template<typename T>
+LinkList<T>& LinkList<T>::operator = (const LinkList<T>& right) {
+    while(currentLength != 0) (*this).Delete();
+    for (int i = 1; i <= right.getCurrentLength(); ++i) {
+        (*this).Insert(*(right.Find(i)->data)); //一定要插入元素，这样才可以新开内存，插入指针会导致析构的时候出问题
+    }
+    return (*this);
+}
+
 template<typename T>
 LinkList<T>::LinkList() {
-    T s;
+    T s = T();
     head = new ListNode<T>(s, NULL);
     currentLength = 0;
 }
@@ -154,7 +164,7 @@ void LinkList<T>::Show() const{
         qDebug()  << "("<< now->data.x << "," << now->data.y << ")";
         now = now->next;
     }
-    qDebug() <<  endl;
+    qDebug() <<  Qt::endl;
 }
 
 template<typename T>

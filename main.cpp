@@ -55,13 +55,10 @@
 #include "Resource.h"
 
 Game game;
-
 int main(int argc, char *argv[])
 {
     Snake *a = new Snake(Point(3,3));
-    //Snake *b = new Snake(Point(2,2));
     game.snakeList.Insert(a);
-    //game.snakeList.Insert(b);
     QApplication app(argc, argv);
     MainWidget w;
     w.show();

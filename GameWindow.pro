@@ -8,6 +8,7 @@ HEADERS       = \
     GameWindow.h \
     LinkList.h \
     Resource.h \
+    Saver.h \
     SettingWindow.h
 SOURCES       = \
                 DesktopWindow.cpp \
@@ -16,6 +17,7 @@ SOURCES       = \
                 GameWindow.cpp \
                 LinkList.cpp \
                 Resource.cpp \
+                Saver.cpp \
                 SettingWindow.cpp \
                 main.cpp
 

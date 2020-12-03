@@ -97,6 +97,7 @@ LinkList<Point> *Snake::getBodyAddr(){
 }
 
 
+
 int Game::snakeMove(Snake* snakeAddr, Point movePos) {
     //----------------------multi------------------
     LinkList<Point> &snakeBody_ = (*snakeAddr).getBody();
@@ -139,9 +140,6 @@ int Game::snakeMove(Snake* snakeAddr, Point movePos) {
     status = 2 超级食物，生命+1
     status = 3 加速事物， 速度+10%（刷新时间-10%）
     status = 4 减速事物， 速度-10%（刷新时间+10%）
-
-
-
     */
     else if (status_%100 == 1 || status_%100 == 2 || status_%100 == 3 ||status_%100 == 4){
         (*snakeAddr).appendBody(targetPos_); //加到蛇头
@@ -154,7 +152,7 @@ int Game::snakeMove(Snake* snakeAddr, Point movePos) {
         while (1) {
             int randx = rand() % (background.getWidth()), randy = rand() % (background.getHeight());
             if (background.getGround()[randx][randy] != 0) continue;
-            background.getGround()[randx][randy] = rand() % 2 + 1; //刷新出四种食物
+            background.getGround()[randx][randy] = rand() % 4 + 1; //刷新出四种食物
             break;
         }
         if (status_ % 100 == 2) {
@@ -175,11 +173,8 @@ int Game::snakeMove(Snake* snakeAddr, Point movePos) {
         (*snakeAddr).errorStatus = -1;//场地上不是纯地面 未完成，需要处理食物的情况
         return -1;
     }
-
-
-
     (*snakeAddr).move(movePos, background.getWidth(), background.getHeight());
-    qDebug() << "snake[" << snakeAddr << "] move to （ " << movePos.x << " , " << movePos.y << " ) " << endl;
+    qDebug() << "snake[" << snakeAddr << "] move to （ " << movePos.x << " , " << movePos.y << " ) " << Qt::endl;
     (*snakeAddr).errorStatus = 0;
     return 0;
 

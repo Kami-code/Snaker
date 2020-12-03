@@ -39,7 +39,7 @@ private:
     int direction = 4;
     int trySetDirection = 4;
     int refreshTime = 200;
-    int life = 9999999999;
+    int life = 1e9;
 public:
     int errorStatus = 0;
     LinkList<Point> &getBody();
@@ -68,7 +68,11 @@ public:
     bool showFigure = true;
     bool showAudio = true;
     bool penetrate = true;
+
     int snakeMove(Snake*, Point);
     void reInit();
 };
+
+
+
 #endif // SNAKE_H

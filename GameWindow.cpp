@@ -133,7 +133,7 @@ void WindowMap::leftClicked(Point a){
     if (a.x < left || a.x > right || a.y < up || a.y > down) return;
     int rowIndex = (a.y - up) / unitHeight;
     int colIndex = (a.x - left) / unitWidth;
-    qDebug() << "change [" <<rowIndex << "][" << colIndex <<"]" << endl;
+    qDebug() << "change [" <<rowIndex << "][" << colIndex <<"]" << Qt::endl;
     (*gameAddr).background.getGround()[colIndex][rowIndex] ++;
 }
 
@@ -200,7 +200,7 @@ void GameWindow::mousePressEvent(QMouseEvent *event)
 
 void GameWindow::keyPressEvent(QKeyEvent * event) {
     int key = event->key();
-    int direction[3];
+    int direction[4];
     memset(direction, 0, sizeof(direction));
     switch (key) {
     case Qt::Key_W:
@@ -266,7 +266,7 @@ void GameWindow::ChangeToDesktop()
 void GameWindow::ChangeToGameOverWindow()
 {
     emit SignalChangeToGameOverWindow();
-    if(game.showAudio)QSound::play(":/sound/failure.wav");
+    if(game.showAudio)QSound::play(":/audio/audio/failure2.wav");
     qDebug()  << "emit gameover!";
 }
 
@@ -292,7 +292,7 @@ int onTimeOut(Snake* snake) //定时器事件触发绑定
         return onTimeOut(snake);
     }
     (*snake).setDirection(tryDirection);
-    qDebug() << "afterstatus = " << afterstatus << endl;
+    qDebug() << "afterstatus = " << afterstatus << Qt::endl;
     return afterstatus;
 }
 
