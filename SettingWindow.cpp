@@ -14,7 +14,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     this->setWindowTitle("Settings");
     this->resize(QSize(640, 480));
     QPalette pal = this->palette();
-    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/title3.jpg")));
+    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/title3.jpg")));
     setPalette(pal);
     audioButton = new QPushButton(this);
     audioButton->move(QPoint(300, 300));
@@ -53,7 +53,7 @@ SettingWindow::SettingWindow(QWidget *parent)
 void SettingWindow::SetSnakes(int nums) {
     while (nums > game.snakeList.getCurrentLength()) {
         Snake* aa = new Snake(Point(1,1));
-        game.snakeList.Insert(aa);
+        game.snakeList.Insert(*aa);
     }
     while (nums < game.snakeList.getCurrentLength()) game.snakeList.Delete();
 }

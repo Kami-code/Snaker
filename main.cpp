@@ -53,12 +53,14 @@
 #include "GameWindow.h"
 #include "Game.h"
 #include "Resource.h"
+#include "Saver.h"
 
 Game game;
+Saver saver;
 int main(int argc, char *argv[])
 {
     Snake *a = new Snake(Point(3,3));
-    game.snakeList.Insert(a);
+    game.snakeList.Insert(*a);
     QApplication app(argc, argv);
     MainWidget w;
     w.show();

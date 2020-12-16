@@ -2,8 +2,10 @@
 #include "GameWindow.h"
 #include "Game.h"
 #include <QSound>
+#include "Saver.h"
 
 extern Game game;
+extern Saver saver;
 
 
 MainWidget::MainWidget(QWidget *parent)
@@ -35,30 +37,45 @@ MainWidget::MainWidget(QWidget *parent)
     bt3 = new QPushButton(this);
     bt3->setText("进入游戏");
     bt3->move(QPoint(150, 150));
-    connect(bt3, &QPushButton::released, this, &MainWidget::changeWindowToSw1);
+    connect(bt3, &QPushButton::released, this, &MainWidget::changeToGameWindow);
 
 
 
     bt4 = new QPushButton(this);
     bt4->setText("游戏设置");
     bt4->move(QPoint(150, 350));
-    connect(bt4, &QPushButton::released, this, &MainWidget::changeWindowToSw3);
+    connect(bt4, &QPushButton::released, this, &MainWidget::changeWindowToSettingWindow);
 
-    sw1 = new GameWindow();
-    sw2 = new GameOverWindow();
-    sw3 = new SettingWindow();
+    bt5 = new QPushButton(this);
+    bt5->setText("读取存档");
+    bt5->move(QPoint(150, 450));
+    connect(bt5, &QPushButton::released, this, &MainWidget::changeWindowToSaverWindow);
+
+    gameWindow = new GameWindow();
+    gameOverWindow = new GameOverWindow();
+    settingWindow = new SettingWindow();
+    saverWindow = new SaverWindow();
 
     void (GameWindow::*funSignal1)() = &GameWindow::SignalChangeToDesktop;
-    void (MainWidget::*funSlot1)() = &MainWidget::changeWindowToDesktop;
     void (GameWindow::*funSignal2)() = &GameWindow::SignalChangeToGameOverWindow;
-    void (MainWidget::*funSlot2)() = &MainWidget::changeWindowToSw2;
     void (GameOverWindow::*funSignal3)() = &GameOverWindow::SignalChangeToDesktop;
     void (SettingWindow::*funSignal4)() = &SettingWindow::SignalChangeToDesktop;
-    connect(sw1, funSignal1, this, funSlot1);
-    //connect(sw1, funSignalParm1, this, funSlotParm1);
-    connect(sw1, funSignal2, this, funSlot2);
-    connect(sw2, funSignal3, this, funSlot1);
-    connect(sw3, funSignal4, this, funSlot1);
+    void (SaverWindow::*funSignal5)() = &SaverWindow::SignalChangeToDesktop;
+    void (GameWindow::*funSignal6)() = &GameWindow::SignalChangeToSaverWindow;
+    void (SaverWindow::*funSingal7)() = &SaverWindow::SignalChangeToGameWindow;
+
+    void (MainWidget::*Desktop)() = &MainWidget::changeWindowToDesktop;
+    void (MainWidget::*GameOverWindow)() = &MainWidget::changeToGameOverWindow;
+    void (MainWidget::*SaverWindow)() = &MainWidget::changeWindowToSaverWindow;
+    void (MainWidget::* NoInitGameWindow)() = &MainWidget::changeToGameWindowWithNoInit;
+
+    connect(gameWindow, funSignal2, this, GameOverWindow);
+    connect(gameWindow, funSignal1, this, Desktop);
+    connect(gameOverWindow, funSignal3, this, Desktop);
+    connect(settingWindow, funSignal4, this, Desktop);
+    connect(saverWindow, funSignal5, this, Desktop);
+    connect(gameWindow, funSignal6, this, SaverWindow);
+    connect(saverWindow, funSingal7, this, NoInitGameWindow);
 }
 
 MainWidget::~MainWidget()
@@ -77,35 +94,60 @@ void MainWidget::myButtonReleasedSlot()
 
 
 
-void MainWidget::changeWindowToSw1()
+void MainWidget::changeToGameWindow()
 {
     desktopSound.stop();
     if(game.showAudio)gameWindowSound.play();
     game.reInit();
     this->hide();
-    sw1->show();
-    sw2->hide();
-    sw3->hide();
+    gameWindow->show();
+    gameOverWindow->hide();
+    settingWindow->hide();
+    saverWindow->hide();
 }
 
-void MainWidget::changeWindowToSw2()
+void MainWidget::changeToGameWindowWithNoInit()
+{
+    desktopSound.stop();
+    if(game.showAudio)gameWindowSound.play();
+    this->hide();
+    gameWindow->show();
+    gameOverWindow->hide();
+    settingWindow->hide();
+    saverWindow->hide();
+}
+
+void MainWidget::changeToGameOverWindow()
 {
     desktopSound.stop();
     gameWindowSound.stop();
     this->hide();
-    sw1->hide();
-    sw2->show();
-    sw3->hide();
+    gameWindow->hide();
+    gameOverWindow->show();
+    settingWindow->hide();
+    saverWindow->hide();
 }
 
-void MainWidget::changeWindowToSw3()
+void MainWidget::changeWindowToSettingWindow()
 {
     desktopSound.stop();
     gameWindowSound.stop();
     this->hide();
-    sw1->hide();
-    sw2->hide();
-    sw3->show();
+    gameWindow->hide();
+    gameOverWindow->hide();
+    settingWindow->show();
+    saverWindow->hide();
+}
+
+void MainWidget::changeWindowToSaverWindow()
+{
+    desktopSound.stop();
+    gameWindowSound.stop();
+    this->hide();
+    gameWindow->hide();
+    gameOverWindow->hide();
+    settingWindow->hide();
+    saverWindow->show();
 }
 
 void MainWidget::changeWindowToDesktop()
@@ -113,17 +155,8 @@ void MainWidget::changeWindowToDesktop()
     gameWindowSound.stop();
     if(game.showAudio)desktopSound.play();
     this->show();
-    sw1->hide();
-    sw2->hide();
-    sw3->hide();
-}
-
-void MainWidget::myDealSubWidget1Para(int num, QString str)
-{
-    qDebug() << "num: " << num << " str: " << str.toUtf8().data();
-    qDebug() << "num: " << num << " str: " << str.toStdString().c_str();
-
-    qWarning() << "num: " << num << " str: " << str.toUtf8().data();
-    qInfo() << "num: " << num << " str: " << str.toUtf8().data();
-    //qFatal(str.toUtf8().data());
+    gameWindow->hide();
+    gameOverWindow->hide();
+    settingWindow->hide();
+    saverWindow->hide();
 }

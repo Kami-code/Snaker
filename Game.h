@@ -14,8 +14,8 @@
 /* 定义场地的主类，这部分需要独立于图形界面，提供游戏的接口。Move()*/
 class Background{
 private:
-    int width = 10;
-    int height = 10;
+    int width = 30;
+    int height = 30;
     int **ground = NULL;
 public:
     Background();
@@ -26,6 +26,7 @@ public:
     int getWidth();
     int getHeight();
     int ** getGround();
+    Background& operator = (const Background&);
 };
 
 /*
@@ -38,9 +39,10 @@ private:
     LinkList<Point> bodyList;
     int direction = 4;
     int trySetDirection = 4;
-    int refreshTime = 200;
+    int refreshTime = 50;
     int life = 1e9;
 public:
+    Snake& operator = (const Snake&);
     int errorStatus = 0;
     LinkList<Point> &getBody();
     LinkList<Point> *getBodyAddr();
@@ -64,12 +66,12 @@ public:
 class Game{
 public:
     Background background;
-    LinkList<Snake*> snakeList;
+    LinkList<Snake> snakeList;
     bool showFigure = true;
     bool showAudio = true;
     bool penetrate = true;
 
-    int snakeMove(Snake*, Point);
+    int snakeMove(Snake&, Point);
     void reInit();
 };
 

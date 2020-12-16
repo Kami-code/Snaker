@@ -66,7 +66,7 @@ template<typename T>
 LinkList<T>& LinkList<T>::operator = (const LinkList<T>& right) {
     while(currentLength != 0) (*this).Delete();
     for (int i = 1; i <= right.getCurrentLength(); ++i) {
-        (*this).Insert(*(right.Find(i)->data)); //一定要插入元素，这样才可以新开内存，插入指针会导致析构的时候出问题
+        (*this).Insert((right.Find(i)->data)); //一定要插入元素，这样才可以新开内存，插入指针会导致析构的时候出问题
     }
     return (*this);
 }
@@ -159,6 +159,10 @@ void LinkList<T>::Delete(int index) {
 
 template<typename T>
 void LinkList<T>::Show() const{
+    if (head == NULL) {
+        qDebug() << "head = null" <<  Qt::endl;
+        return;
+    }
     ListNode<T>* now = head;
     while(now != NULL) {
         qDebug()  << "("<< now->data.x << "," << now->data.y << ")";

@@ -92,8 +92,12 @@ public:
     ~GameWindow();
     void ChangeToDesktop();
     void ChangeToGameOverWindow();
+    void ChangeToSaverWindow();
     void GameStopped();
-    void timelyAccess();
+    void timelyAccess0();
+    void timelyAccess1();
+    void timelyAccess2();
+    void save();
 signals:
     /*
      * 信号必须要signals关键字来声明
@@ -104,6 +108,7 @@ signals:
      */
     void SignalChangeToDesktop();
     void SignalChangeToGameOverWindow();
+    void SignalChangeToSaverWindow();
 protected:
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
@@ -113,9 +118,9 @@ public slots:
 
 private:
 
-    QPushButton * at,*bt;
+    QPushButton * at,*bt, *ct;
     WindowMap windowMap;
-    QTimer *timer;
+    QTimer *timer[3];
     bool stopped = true;
 };
 

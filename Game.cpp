@@ -34,6 +34,16 @@ int Background::getHeight(){return height;}
 int **Background::getGround(){return ground;}
 void Background::setHeight(int a){height = a;}
 void Background::setWidth(int a){width = a;}
+Background& Background::operator = (const Background& a) {
+    width = a.width;
+    height = a.height;
+    clearGround();
+    setGround();
+    for (int i = 0; i < width; ++i ) {
+        for (int j = 0; j < height; ++j) ground[i][j] = a.ground[i][j];
+    }
+}
+
 /*snake的构造函数，创造头指针*/
 Snake::Snake(){
     ListNode<Point> *head = new ListNode<Point>(Point(1,1), NULL);
@@ -43,6 +53,15 @@ Snake::Snake(){
 Snake::Snake(Point a){
     ListNode<Point> *head = new ListNode<Point>(a, NULL);
     bodyList.Insert(head);
+}
+
+Snake& Snake::operator = (const Snake& right) {
+    bodyList = right.bodyList;
+    direction = right.direction;
+    trySetDirection = right.trySetDirection;
+    refreshTime = right.refreshTime;
+    life = right.life;
+    return (*this);
 }
 
 //void Snake
@@ -81,7 +100,7 @@ void Snake::move(Point movePos, int width, int height) {
     bodyList.Delete();
 }
 
-void Snake::clear(Point a) {
+void Snake::clear(Point a = Point(1,1)) {
     while (bodyList.getCurrentLength() != 0) bodyList.Delete();
     bodyList.setCurrentLength(0);
     ListNode<Point> *head = new ListNode<Point>(a, NULL);
@@ -98,16 +117,16 @@ LinkList<Point> *Snake::getBodyAddr(){
 
 
 
-int Game::snakeMove(Snake* snakeAddr, Point movePos) {
+int Game::snakeMove(Snake& snakeLocal, Point movePos) {
     //----------------------multi------------------
-    LinkList<Point> &snakeBody_ = (*snakeAddr).getBody();
+    LinkList<Point> &snakeBody_ = snakeLocal.getBody();
     snakeBody_.Show();
-    Point nowPos_ = (*snakeAddr).position();
+    Point nowPos_ = snakeLocal.position();
     Point targetPos_ =nowPos_.move(movePos);
     /*check vaild*/
     if (targetPos_.x >= background.getWidth() || targetPos_.y >= background.getHeight() || targetPos_.x < 0 || targetPos_.y < 0) {
         if (!penetrate) {
-            (*snakeAddr).errorStatus = -3;
+            snakeLocal.errorStatus = -3;
             return -3; //如果要去的地方是边界，返回-3， 未完成要写场景穿透和游戏失败的情况
         }
         else {
@@ -126,7 +145,7 @@ int Game::snakeMove(Snake* snakeAddr, Point movePos) {
                 if (cnt == 1) {
                     return -4; //如果是回头的情况，防止用户的误触导致暴毙，返回-4无效化本次操作。
                 }
-                (*snakeAddr).errorStatus = -2;
+                snakeLocal.errorStatus = -2;
 
                 return -2; //如果要去的地方已经是蛇的身体了，返回-2，要继续写游戏失败的情况
             }
@@ -138,11 +157,11 @@ int Game::snakeMove(Snake* snakeAddr, Point movePos) {
     /*
     status = 1 普通食物，长度+1
     status = 2 超级食物，生命+1
-    status = 3 加速事物， 速度+10%（刷新时间-10%）
-    status = 4 减速事物， 速度-10%（刷新时间+10%）
+    status = 3 加速食物， 速度+10%（刷新时间-10%）
+    status = 4 减速食物， 速度-10%（刷新时间+10%）
     */
     else if (status_%100 == 1 || status_%100 == 2 || status_%100 == 3 ||status_%100 == 4){
-        (*snakeAddr).appendBody(targetPos_); //加到蛇头
+        snakeLocal.appendBody(targetPos_); //加到蛇头
         int **ground = background.getGround();
         ListNode<Point>* head_ = snakeBody_.head->next;
         while (head_ != NULL) {
@@ -156,26 +175,26 @@ int Game::snakeMove(Snake* snakeAddr, Point movePos) {
             break;
         }
         if (status_ % 100 == 2) {
-            (*snakeAddr).setLife((*snakeAddr).getLife() + 1);
+            snakeLocal.setLife(snakeLocal.getLife() + 1);
         }
         if (status_ % 100 == 3) {
-            (*snakeAddr).setRefreshTime(int(0.5 * (*snakeAddr).getRefreshTime()));
+            snakeLocal.setRefreshTime(int(0.5 * snakeLocal.getRefreshTime()));
         }
         if (status_ % 100== 4) {
-            (*snakeAddr).setRefreshTime(int(1.2 * (*snakeAddr).getRefreshTime()));
+            snakeLocal.setRefreshTime(int(1.2 * snakeLocal.getRefreshTime()));
         }
         background.getGround()[targetPos_.x][targetPos_.y] = 0; //先刷新再吃掉食物，以免刷在蛇头重叠处出现Bug
         if(showAudio)QSound::play(":/audio/audio/eatnormal.wav");
-        (*snakeAddr).errorStatus = 1;
+        snakeLocal.errorStatus = 1;
         return 1;
     }
     else {
-        (*snakeAddr).errorStatus = -1;//场地上不是纯地面 未完成，需要处理食物的情况
+        snakeLocal.errorStatus = -1;//场地上不是纯地面 未完成，需要处理食物的情况
         return -1;
     }
-    (*snakeAddr).move(movePos, background.getWidth(), background.getHeight());
-    qDebug() << "snake[" << snakeAddr << "] move to （ " << movePos.x << " , " << movePos.y << " ) " << Qt::endl;
-    (*snakeAddr).errorStatus = 0;
+    snakeLocal.move(movePos, background.getWidth(), background.getHeight());
+    qDebug() << "snake[" << &snakeLocal << "] move to （ " << movePos.x << " , " << movePos.y << " ) " << Qt::endl;
+    snakeLocal.errorStatus = 0;
     return 0;
 
 }
@@ -183,15 +202,13 @@ int Game::snakeMove(Snake* snakeAddr, Point movePos) {
 void Game::reInit(){
     background.clearGround();
     background.setGround();
-    ListNode<Snake*> *head = snakeList.head->next;
+    ListNode<Snake> *head = snakeList.head->next;
     while (head != NULL) {
-        Snake *snake = head->data;
-        delete snake;
-        snake = new Snake(Point(3,3));
-        (*snake).setTryDirection(4);
-        (*snake).setDirection(4);
-        (*snake).errorStatus = 0;
-        head->data = snake;
+        Snake &snake = head->data;
+        snake.clear();
+        snake.setTryDirection(4);
+        snake.setDirection(4);
+        snake.errorStatus = 0;
         head = head->next;
     }
 

@@ -11,6 +11,7 @@
 #include "SettingWindow.h"
 #include <QSound>
 #include "Resource.h"
+#include "SaverWindow.h"
 
 
 class MainWidget : public QWidget
@@ -25,12 +26,12 @@ signals:
 
 public slots:
     void myButtonReleasedSlot();
-    void changeWindowToSw1();
-    void changeWindowToSw2();
-    void changeWindowToSw3();
+    void changeToGameWindow();
+    void changeToGameOverWindow();
+    void changeWindowToSettingWindow();
+    void changeWindowToSaverWindow();
     void changeWindowToDesktop();
-    void myDealSubWidget1Para(int, QString);
-
+    void changeToGameWindowWithNoInit();
 private:
     //Ui::MainWidgetClass ui;
 
@@ -38,13 +39,14 @@ private:
     QPushButton * bt2;
     QPushButton * bt3;
     QPushButton * bt4;
+    QPushButton * bt5;
 
     QSound desktopSound;
     QSound gameWindowSound;
-    GameWindow * sw1;
-    GameOverWindow *sw2;
-    SettingWindow *sw3;
-
+    GameWindow * gameWindow;
+    GameOverWindow * gameOverWindow;
+    SettingWindow * settingWindow;
+    SaverWindow * saverWindow;
 };
 
 #endif // MAINWIDGET_H
