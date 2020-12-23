@@ -54,6 +54,20 @@
 >     QTimer *timer[maxTimer];
 >     bool stopped = true;
 
+#### (3) SettingWindow
+  本界面作为游戏设置界面，主要负责与用户的交互，实现音效控制、图形控制、网格大小、蛇的数量等设置。
+>    QPushButton * audioButton;
+>    QPushButton * figureButton;
+>    QPushButton * returnButton;
+>    QSlider * gridSlider;;
+>    QSlider * snakeSlider;
+>    
+#### (4) SaverWindow
+  本界面作为游戏存档界面，主要实现存档和读档功能。
+  
+#### (5) GameOverWindow
+  本界面作为游戏结算界面，主要实现结算功能。
+
 ##  三、项目实现
 ### 1.游戏开始菜单
 
