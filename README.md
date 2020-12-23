@@ -14,32 +14,32 @@
 ### 1.内核类
 #### (1)Game class
   Game含以下成员，
->  Background background;		//存放地图类
->  LinkList<Snake> snakeList;	//存放蛇的链表（多人游戏）
->     Setting setting;			//存放游戏设置文件
+>   Background background;				//存放地图类
+>   LinkList<Snake> snakeList;			//存放蛇的链表（多人游戏）
+>     Setting setting;								  //存放游戏设置文件
 
 #### (2)Snake class
   Snake含以下私有成员，
->  LinkList<Point> bodyList; 	//存放每个关节的结点
->     int direction = 4;			//存放真实方向
->     int trySetDirection = 4;	//存放尝试方向
->     int refreshTime = 50;		//存放刷新率
->     int life = 3;				//存放剩余生命值
+>     LinkList<Point> bodyList; 			//存放每个关节的结点
+>     int direction = 4;							  //存放真实方向
+>     int trySetDirection = 4;					//存放尝试方向
+>     int refreshTime = 50;						//存放刷新率
+>     int life = 3;										//存放剩余生命值
 
 #### (3)Background class
   Background含以下私有成员，
->     int width = 30;				//场景横向网格格子数
->     int height = 30;			//场景纵向网格格子数
->     int **ground = NULL;		//二维数组，存放网格状态
+>     int width = 30;				 //场景横向网格格子数
+>     int height = 30;				//场景纵向网格格子数
+>     int **ground = NULL;	 //二维数组，存放网格状态
 
 #### (4)Saver class
->     Game gameSaved[3];		//目前支持存放3个存档
->     bool saved[3];			//判断存档的存储状态
+>     Game gameSaved[3];			//目前支持存放3个存档
+>     bool saved[3];						//判断存档的存储状态
 
 ### 2.图形化部分
   图形化部分提供了Snaker的图形化实现，包括主菜单、设置界面、游戏主界面、战斗结算界面等的架构及其实现。
 #### (1)DesktopWindow
-  本界面作为游戏的主菜单界面，包含其余所有界面作为其成员，并实现所有切换画面和音效的功能。
+  本界面作为游戏的菜单界面，包含其余所有界面作为其成员，并实现所有切换画面和音效的功能。
 >     QSound desktopSound;
 >     QSound gameWindowSound;
 >     GameWindow * gameWindow;
@@ -47,6 +47,12 @@
 >     SettingWindow * settingWindow;
 >     SaverWindow * saverWindow;
 
+#### (2) GameWindow
+  本界面作为游戏主界面，主要实现周期刷新游戏场景，更新游戏元素（蛇、食物、墙）的任务。
+>     QPushButton * button[maxButton];
+>     WindowMap windowMap;
+>     QTimer *timer[maxTimer];
+>     bool stopped = true;
 
 ##  三、项目实现
 ### 1.游戏开始菜单
@@ -67,18 +73,27 @@
 
 ### 5.单机多⼈游戏
   首先，我们将Game存储Snake的方式更改为链表，并在*SettingWindow*中提供了滑块条给用户修改蛇的数量的接口。第一条蛇绑定按键WASD，第二条蛇绑定按键IJKL，其余蛇绑定按键上下左右。
-### 6.具有三种特殊效果的⻝物（9 分）
+### 6.具有三种特殊效果的⻝物
   #### (1)加⼀条命
+
   死亡后，为了防止同一地点出现反复触发死亡判定的情况。我们选择蛇自动移动到左下角地图外，向地图中移动。
   #### (2)加速/减速
+
   我们通过修改*snake.refreshTime*，并在每次计时器超时的时候，更新计时器刷新时间。针对扩展到n条蛇的情况，我们选择在绑定timeout信号的槽函数中判断*sender()*得到调用此计时器的对象蛇的信息。避免了由于timeout信号的槽函数无法传递形参导致需要设置n个对应函数的情况。
   #### (3)镜像翻转
+
   吃到此食物后，按键镜像翻转，通过一个布尔型判断。
 ### 7. 地图编辑
+
   在游戏开始前、以及游戏暂停时，可以编辑地图上的砖块和各种⻝物。由于游戏网格的绘制由**WindowMap**实现，在其中提供了*leftClicked*函数来提供鼠标点击点到网格坐标的映射。映射后修改*background.ground*的对应状态即可。
 ### 8. 简单的 AI 蛇
 
+  游戏提供了多种寻路方法(DFS，BFS)，供蛇在场景中寻路。当蛇并不能直接找到一条路径时，将采用启发性算法，尝试找到一条可能路径。
+### 9.用户友好设计
+
+  游戏内含大量的资源文件的封装，包含各种场景元素的立绘、场景触发的音效、不同界面的背景音乐，提供给用户良好的视觉和听觉盛宴。设置界面提供给了用户以修改网格格数的滑动条，方便用户进行不同难度的游戏。
 
 # 四、代码风格
-本项目中，变量均满足小骆驼式命名法——函数名中的每一个逻辑断点都有一个大写字母来标记。
-本项目中，函数均满足大骆驼式命名法——函数名中的每一个逻辑断点都有一个大写字母来标记。
+
+  本项目中，变量均满足小骆驼式命名法（变量名中的每一个逻辑断点都有一个大写字母来标记），函数均满足大骆驼式命名法。
+  关键代码均已添加注释，方便阅览。
