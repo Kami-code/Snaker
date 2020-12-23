@@ -29,7 +29,8 @@ QMAKE_PROJECT_NAME = widgets_analogclock
 target.path = $$[QT_INSTALL_EXAMPLES]/widgets/widgets/analogclock
 INSTALLS += target
 
-DISTFILES +=
+DISTFILES += \
+    README.md
 
 RESOURCES += \
     source.qrc

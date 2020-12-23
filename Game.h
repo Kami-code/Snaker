@@ -40,7 +40,7 @@ private:
     int direction = 4;
     int trySetDirection = 4;
     int refreshTime = 50;
-    int life = 1e9;
+    int life = 3;
 public:
     Snake& operator = (const Snake&);
     int errorStatus = 0;
@@ -70,7 +70,7 @@ public:
     bool showFigure = true;
     bool showAudio = true;
     bool penetrate = true;
-
+    int lived_snakes = 1;
     int snakeMove(Snake&, Point);
     void reInit();
 };

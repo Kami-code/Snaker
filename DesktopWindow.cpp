@@ -12,10 +12,11 @@ MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent), desktopSound(":/audio/audio/desktop.wav"), gameWindowSound(":/audio/audio/fight.wav")
 {
     if(game.showAudio)desktopSound.play();
-    QPalette pal = this->palette();
-    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/title.jpg")));
-    setPalette(pal);
-
+    if (game.showFigure){
+        QPalette pal = this->palette();
+        pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/title.jpg")));
+        setPalette(pal);
+    }
     this->setParent(parent);
     this->setWindowTitle("Game Desktop");
     this->resize(QSize(500, 500));

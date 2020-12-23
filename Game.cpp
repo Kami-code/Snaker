@@ -42,6 +42,7 @@ Background& Background::operator = (const Background& a) {
     for (int i = 0; i < width; ++i ) {
         for (int j = 0; j < height; ++j) ground[i][j] = a.ground[i][j];
     }
+    return (*this);
 }
 
 /*snake的构造函数，创造头指针*/
@@ -188,6 +189,7 @@ int Game::snakeMove(Snake& snakeLocal, Point movePos) {
         snakeLocal.errorStatus = 1;
         return 1;
     }
+
     else {
         snakeLocal.errorStatus = -1;//场地上不是纯地面 未完成，需要处理食物的情况
         return -1;

@@ -83,7 +83,14 @@ void WindowMap::init(Game* game, Point a, Point b) {
     unitHeight = height / gameHeight;
 }
 
-void WindowMap::draw(QPainter *painter) {
+/*
+ * function: draw
+ * Parameters:
+ *          painter – a painter bound to the instance of the GameWindow
+ * Description: Draw the gamewindow interface, which contains grids, snakes, foods, and walls.
+ * This function is called by GameWindow::paintEvent.
+ */
+void WindowMap::draw(QPainter *painter) { /*绘制游戏界面，被paintEvent调用*/
     (*painter).setRenderHint(QPainter::Antialiasing);
     (*painter).translate(left, up);
     //painter.scale(side / 200.0, side / 200.0);
@@ -91,9 +98,11 @@ void WindowMap::draw(QPainter *painter) {
         for (int j = 0; j < gameHeight; j ++) {
             int status = (*gameAddr).background.getGround()[i][j] % 100;
             if (status == 0) {
+                if (game.showFigure)
                 (*painter).setPen(QColor(255,255,255,255));
+                else (*painter).setPen(QColor(0,0,0,255));
                 (*painter).setBrush(Qt::NoBrush);
-                (*painter).drawRect(unitWidth * i,unitHeight * j,unitWidth , unitHeight);
+                (*painter).drawRect(unitWidth * i,unitHeight * j,unitWidth , unitHeight);/*绘制网格*/
             }
             else {
                 if (!game.showFigure) {
@@ -114,9 +123,11 @@ void WindowMap::draw(QPainter *painter) {
 
     //绘制蛇
     ListNode<Snake> *head = game.snakeList.head->next;
+
     int cnt = 0;
     while (head != NULL) {
         ListNode<Point> *header = (head->data).getBody().head->next;
+        if (head->data.getLife() < 0) continue;
         while (header != NULL) {
             if (!game.showFigure) {
                 (*painter).drawRect(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth,unitHeight);
@@ -128,9 +139,14 @@ void WindowMap::draw(QPainter *painter) {
         }
         head = head->next; cnt++;
     }
-
 }
 
+/*
+ * function: leftClicked
+ * Parameters:
+ *          a – point of window where the mouse click.
+ * Description: Get the index of the game.ground and plus one(change the ground status).
+ */
 void WindowMap::leftClicked(Point a){
     if (a.x < left || a.x > right || a.y < up || a.y > down) return;
     int rowIndex = (a.y - up) / unitHeight;
@@ -139,6 +155,10 @@ void WindowMap::leftClicked(Point a){
     (*gameAddr).background.getGround()[colIndex][rowIndex] ++;
 }
 
+/*
+ * function: GameStopped
+ * Description: Reverse the flag stopped. Stop or restart the game according to the flag.
+ */
 void GameWindow::GameStopped(){
     if (stopped) {
         timer[0]->start(300);
@@ -155,14 +175,18 @@ void GameWindow::GameStopped(){
     stopped = !stopped;
 }
 
+/*
+ * function: GameWindow
+ * Description: Create the window.
+ */
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent)
 {
+    if (game.showFigure){
+        QPalette pal = this->palette();
+        pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/grass.png")));
+    }
 
-    QPalette pal = this->palette();
-    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/grass.png")));
-    setPalette(pal);
-    this->setParent(parent);
     this->setWindowTitle("游戏界面");
     this->resize(QSize(640, 480));
 
@@ -181,12 +205,14 @@ GameWindow::GameWindow(QWidget *parent)
     ct->move(QPoint(150, 50));
     connect(ct, &QPushButton::released, this, &GameWindow::save);
 
-    timer[0] = new QTimer(this);
-    timer[1] = new QTimer(this);
-    timer[2] = new QTimer(this);
-    connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess0)); //定周期调用move函数
-    connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess1)); //定周期调用move函数
-    connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess2)); //定周期调用move函数
+    for (int i = 0; i < 100; i++) {
+        timer[i] = new QTimer(this);
+        timer[i]->setObjectName(QString(i));
+        connect(timer[i], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
+    }
+    //connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
+    //connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
+    //connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
     stopped = true; //一开始蛇静止
     QTimer* timer2 = new QTimer(this); //不需要写为成员变量，自动消亡
     connect(timer2, &QTimer::timeout, this, QOverload<>::of(&GameWindow::update)); //定周期刷新界面
@@ -195,6 +221,12 @@ GameWindow::GameWindow(QWidget *parent)
     setWindowTitle(tr("Game"));
 }
 
+/*
+ * function: mousePressEvent
+ * Parameters:
+ *          event – QMouseEvent
+ * Description: When each mouse press detected, call this function to deal with it.
+ */
 void GameWindow::mousePressEvent(QMouseEvent *event)
 {
     //左键按下
@@ -212,6 +244,15 @@ void GameWindow::mousePressEvent(QMouseEvent *event)
     }
 }
 
+/*
+ * function: keyPressEvent
+ * Parameters:
+ *          event – QKeyEvent
+ * Description: When each key press detected, call this function to deal with it.
+ * Using W,A,S,D to move the first snake.
+ * Using I,J,K,L to move the first snake.
+ * Using up,down,left,right arrow to move the other snakes.
+ */
 void GameWindow::keyPressEvent(QKeyEvent * event) {
     int key = event->key();
     int direction[4];
@@ -272,6 +313,7 @@ void GameWindow::ChangeToSaverWindow()
 
 int onTimeOut(Snake& snakeLocal) //定时器事件触发绑定
 {
+    if (snakeLocal.getLife() <= 0) return -5;
     int tryDirection = snakeLocal.getTryDirection();
     int afterstatus = 0;
     if (tryDirection == 1) {
@@ -295,24 +337,62 @@ int onTimeOut(Snake& snakeLocal) //定时器事件触发绑定
     return afterstatus;
 }
 
-void GameWindow::timelyAccess0() {
-    ListNode<Snake> *head = game.snakeList.head->next;
+long long getCurrentTime()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
 
-    while (head != NULL) {
-        Snake &snakeLocal = head->data;
-        timer[0]->start(snakeLocal.getRefreshTime());
-        if (onTimeOut(snakeLocal) < 0){
-            snakeLocal.setLife(snakeLocal.getLife() - 1);
-            if (snakeLocal.getLife() <= 0) {
-                ChangeToGameOverWindow();
-                timer[0]->stop();
-                stopped = true;
-                return;
-            }
-        }
-        head = head->next;
+void GameWindow::timelyAccess() {
+
+    QString m_ObjectName = sender()->objectName();
+    qDebug() << "sender is :" << m_ObjectName << Qt::endl;
+    qDebug() << "need sender is :" << timer[0] << Qt::endl;
+    int index = 0;
+    while (1) {
+        qDebug() << "while sender is :" << timer[index]->objectName() << Qt::endl;
+        if (m_ObjectName == timer[index++]->objectName()) break;
+
     }
-    timer[0]->start();
+    ListNode<Snake> *head = game.snakeList.Find(index - 2);
+    Snake &snakeLocal = head->data;
+    timer[index]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
+        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+            game.lived_snakes --;
+            while (snakeLocal.getBody().getCurrentLength() > 0) {
+                snakeLocal.getBody().Delete();
+            }
+            timer[index]->stop();
+        }
+    }
+    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+        ChangeToGameOverWindow();
+        stopped = true;
+        return;
+    }
+    update();
+}
+void GameWindow::timelyAccess0() {
+    //long long int now_time = getCurrentTime();
+    ListNode<Snake> *head = game.snakeList.head->next;
+    Snake &snakeLocal = head->data;
+    timer[0]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
+        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+            game.lived_snakes --;
+            while (snakeLocal.getBody().getCurrentLength() > 0) {
+                snakeLocal.getBody().Delete();
+            }
+            timer[0]->stop();
+        }
+    }
+    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+        ChangeToGameOverWindow();
+        stopped = true;
+        return;
+    }
 
     update();
 }
@@ -320,23 +400,35 @@ void GameWindow::timelyAccess0() {
 void GameWindow::timelyAccess1() {
     if (game.snakeList.head->next->next == NULL) return;
     ListNode<Snake> *head = game.snakeList.head->next->next;
-
-    while (head != NULL) {
-        Snake &snakeLocal = head->data;
-        timer[1]->start(snakeLocal.getRefreshTime());
-        if (onTimeOut(snakeLocal) < 0){
-            snakeLocal.setLife(snakeLocal.getLife() - 1);
-            if (snakeLocal.getLife() <= 0) {
-                ChangeToGameOverWindow();
-                timer[1]->stop();
-                stopped = true;
-                return;
+    Snake &snakeLocal = head->data;
+    timer[1]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
+        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+            game.lived_snakes --;
+            while (snakeLocal.getBody().getCurrentLength() > 0) {
+                snakeLocal.getBody().Delete();
             }
+            timer[1]->stop();
         }
-        head = head->next;
-    }
-    timer[1]->start();
+        else {
+            int length = snakeLocal.getBody().getCurrentLength();
+            while (snakeLocal.getBody().getCurrentLength() > 0) {
+                snakeLocal.getBody().Delete();
+            }
+            for (int i = 0; i < length; i++) {
+                snakeLocal.getBody().Insert(Point(0,i));
+                snakeLocal.setDirection(1);
+                snakeLocal.setTryDirection(1);
+            }
 
+        }
+    }
+    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+        ChangeToGameOverWindow();
+        stopped = true;
+        return;
+    }
     update();
 }
 
@@ -344,23 +436,23 @@ void GameWindow::timelyAccess2() {
     if (game.snakeList.head->next->next == NULL) return;
     if (game.snakeList.head->next->next->next == NULL) return;
     ListNode<Snake> *head = game.snakeList.head->next->next->next;
-
-    while (head != NULL) {
-        Snake &snakeLocal = head->data;
-        timer[2]->start(snakeLocal.getRefreshTime());
-        if (onTimeOut(snakeLocal) < 0){
-            snakeLocal.setLife(snakeLocal.getLife() - 1);
-            if (snakeLocal.getLife() <= 0) {
-                ChangeToGameOverWindow();
-                timer[2]->stop();
-                stopped = true;
-                return;
+    Snake &snakeLocal = head->data;
+    timer[2]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
+        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+            game.lived_snakes --;
+            while (snakeLocal.getBody().getCurrentLength() > 0) {
+                snakeLocal.getBody().Delete();
             }
+            timer[2]->stop();
         }
-        head = head->next;
     }
-    timer[2]->start();
-
+    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+        ChangeToGameOverWindow();
+        stopped = true;
+        return;
+    }
     update();
 }
 
@@ -369,13 +461,12 @@ void GameWindow::save(){
     timer[1]->stop();
     timer[2]->stop();
     ChangeToSaverWindow();
-
 }
 
 void GameWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this); //创建painter，绑定此窗口
-    windowMap.init(&game, Point(80,0), Point(560,480)); //绑定game
+    windowMap.init(&game, Point(80,0), Point(560,480)); //绑定game,设置左上角和右下角
     windowMap.draw(&painter); //绑定painter
 
 

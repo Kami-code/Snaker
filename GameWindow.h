@@ -62,24 +62,24 @@ class WindowMap
 {
 private:
     float size;
-    float left;
-    float up;
-    float right;
-    float down;
+    float left;         /*左上角的x值*/
+    float up;           /*左上角的y值*/
+    float right;        /*右下角的x值*/
+    float down;         /*右下角的y值*/
     float width;
     float height;
     float unitWidth;
     float unitHeight;
-    float gameWidth;
-    float gameHeight;
-    Game *gameAddr;
+    float gameWidth;    /*场地横向格子数目*/
+    float gameHeight;   /*场地纵向格子数目*/
+    Game *gameAddr;     /*绑定Game*/
 public:
     WindowMap();
     WindowMap(Game *, Point, Point);
     void init(Game *, Point, Point);
     void draw( QPainter *painter);
-    void leftClicked(Point);
-    Resource resource;
+    void leftClicked(Point);            /*屏幕被点击的情况，通过反映射找出*/
+    Resource resource;                  /*绑定界面资源文件*/
 };
 
 class GameWindow : public QWidget
@@ -94,6 +94,7 @@ public:
     void ChangeToGameOverWindow();
     void ChangeToSaverWindow();
     void GameStopped();
+    void timelyAccess();
     void timelyAccess0();
     void timelyAccess1();
     void timelyAccess2();
@@ -120,7 +121,8 @@ private:
 
     QPushButton * at,*bt, *ct;
     WindowMap windowMap;
-    QTimer *timer[3];
+    QTimer *timer[100];
+    int timeCount = 0;
     bool stopped = true;
 };
 

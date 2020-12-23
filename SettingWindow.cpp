@@ -51,6 +51,7 @@ SettingWindow::SettingWindow(QWidget *parent)
 }
 
 void SettingWindow::SetSnakes(int nums) {
+    game.lived_snakes = nums;
     while (nums > game.snakeList.getCurrentLength()) {
         Snake* aa = new Snake(Point(1,1));
         game.snakeList.Insert(*aa);
