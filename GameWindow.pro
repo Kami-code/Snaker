@@ -2,32 +2,28 @@ QT += widgets
 QT+= multimedia
 
 HEADERS       = \
-    DesktopWindow.h \
-    Game.h \
-    GameOverWindow.h \
-    GameWindow.h \
-    LinkList.h \
-    Resource.h \
-    Saver.h \
-    SaverWindow.h \
-    SettingWindow.h
+    header/DesktopWindow.h \
+    header/Game.h \
+    header/GameOverWindow.h \
+    header/GameWindow.h \
+    header/LinkList.h \
+    header/Resource.h \
+    header/Saver.h \
+    header/SaverWindow.h \
+    header/SettingWindow.h
 SOURCES       = \
-                DesktopWindow.cpp \
-                Game.cpp \
-                GameOverWindow.cpp \
-                GameWindow.cpp \
-                LinkList.cpp \
-                Resource.cpp \
-                Saver.cpp \
-                SaverWindow.cpp \
-                SettingWindow.cpp \
+                src/DesktopWindow.cpp \
+                src/Game.cpp \
+                src/GameOverWindow.cpp \
+                src/GameWindow.cpp \
+                src/LinkList.cpp \
+                src/Resource.cpp \
+                src/Saver.cpp \
+                src/SaverWindow.cpp \
+                src/SettingWindow.cpp \
                 main.cpp
 
-QMAKE_PROJECT_NAME = widgets_analogclock
-
-# install
-target.path = $$[QT_INSTALL_EXAMPLES]/widgets/widgets/analogclock
-INSTALLS += target
+QMAKE_PROJECT_NAME = Snaker
 
 DISTFILES += \
     README.md

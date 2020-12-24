@@ -49,11 +49,11 @@
 ****************************************************************************/
 
 #include <QApplication>
-#include "DesktopWindow.h"
-#include "GameWindow.h"
-#include "Game.h"
-#include "Resource.h"
-#include "Saver.h"
+#include "header/Game.h"
+#include "header/Saver.h"
+#include "header/Resource.h"
+#include "header/GameWindow.h"
+#include "header/DesktopWindow.h"
 
 Game game;
 Saver saver;
