@@ -121,7 +121,7 @@ private:
 
     QPushButton * at,*bt, *ct;
     WindowMap windowMap;
-    QTimer *timer[100];
+    QTimer *timer[5];
     int timeCount = 0;
     bool stopped = true;
 };

@@ -182,11 +182,10 @@ void GameWindow::GameStopped(){
 GameWindow::GameWindow(QWidget *parent)
     : QWidget(parent)
 {
-    if (game.showFigure){
-        QPalette pal = this->palette();
-        pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/grass.png")));
-    }
 
+    QPalette pal = this->palette();
+    pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/grass.png")));
+    setPalette(pal);
     this->setWindowTitle("游戏界面");
     this->resize(QSize(640, 480));
 
@@ -205,14 +204,17 @@ GameWindow::GameWindow(QWidget *parent)
     ct->move(QPoint(150, 50));
     connect(ct, &QPushButton::released, this, &GameWindow::save);
 
-    for (int i = 0; i < 100; i++) {
-        timer[i] = new QTimer(this);
-        timer[i]->setObjectName(QString(i));
-        connect(timer[i], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
-    }
-    //connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
-    //connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
-    //connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
+//    for (int i = 0; i < 100; i++) {
+//        timer[i] = new QTimer(this);
+//        timer[i]->setObjectName(QString(i));
+//        connect(timer[i], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
+//    }
+    timer[0] = new QTimer(this);
+    timer[1] = new QTimer(this);
+    timer[2] = new QTimer(this);
+    connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess0)); //定周期调用move函数
+    connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess1)); //定周期调用move函数
+    connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess2)); //定周期调用move函数
     stopped = true; //一开始蛇静止
     QTimer* timer2 = new QTimer(this); //不需要写为成员变量，自动消亡
     connect(timer2, &QTimer::timeout, this, QOverload<>::of(&GameWindow::update)); //定周期刷新界面

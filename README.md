@@ -7,6 +7,14 @@
   用键盘WASD控制蛇的方向，寻找吃的东西，每吃一口就能得到一定的积分，而且蛇的身子会越吃越长，身子越长玩的难度就越大，不能碰墙，不能咬到自己的身体，等到了一定的分数，就能过关！
   贪吃蛇的唯一的目标就是长成最长的一条蛇！控制小蛇走位，吃掉地图上不定时冒出的食物，就会变长。小心！蛇头碰到其他蛇就会死亡，并且在地图上产生大量食物！
 
+![avatar](https://github.com/Kami-code/Snaker/raw/master/DesktopWindow.png?raw=true)  
+
+![avatar](https://github.com/Kami-code/Snaker/raw/master/GameWindow.png?raw=true)
+
+  ![avatar](https://github.com/Kami-code/Snaker/raw/master/SettingWindow.png?raw=true)
+
+  ![avatar](https://github.com/Kami-code/Snaker/raw/master/SaverWindow.png?raw=true)
+
 ## 二、系统设计
 
   由于考虑到AI蛇的训练过程中可能需要调用游戏主程序来完成交互工作，需要提供独立与图形界面之外的接口，这也是面向对象模块化编程的要素。故在设计的过程中严格按照模块之间的独立性、模块的可扩展性进行设计。
@@ -64,7 +72,7 @@
 >    
 #### (4) SaverWindow
   本界面作为游戏存档界面，主要实现存档和读档功能。
-  
+
 #### (5) GameOverWindow
   本界面作为游戏结算界面，主要实现结算功能。
 
