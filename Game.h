@@ -14,18 +14,18 @@
 /* 定义场地的主类，这部分需要独立于图形界面，提供游戏的接口。Move()*/
 class Background{
 private:
-    int width = 30;
-    int height = 30;
-    int **ground = NULL;
+    int width = 30;             //场景横向网格格子数
+    int height = 30;            //场景纵向网格格子数
+    int **ground = NULL;        //二维数组，存放网格状态
 public:
     Background();
-    void clearGround();
-    void setGround();
-    void setWidth(int);
-    void setHeight(int);
-    int getWidth();
-    int getHeight();
-    int ** getGround();
+    void ClearGround();
+    void SetGround();
+    void SetWidth(int);
+    void SetHeight(int);
+    int GetWidth();
+    int GetHeight();
+    int ** GetGround();
     Background& operator = (const Background&);
 };
 
@@ -36,43 +36,43 @@ public:
 
 class Snake{
 private:
-    LinkList<Point> bodyList;
-    int direction = 4;
-    int trySetDirection = 4;
-    int refreshTime = 50;
-    int life = 3;
+    LinkList<Point> bodyList;       //存放每个关节的结点
+    int direction = 4;              //存放真实方向
+    int trySetDirection = 4;        //存放尝试方向
+    int refreshTime = 50;           //存放刷新率
+    int life = 3;                   //存放剩余生命值
 public:
     Snake& operator = (const Snake&);
     int errorStatus = 0;
-    LinkList<Point> &getBody();
-    LinkList<Point> *getBodyAddr();
-    int getDirection();
-    int getTryDirection();
-    int getRefreshTime();
-    int getLife();
-    void setDirection(int);
-    void setTryDirection(int);
-    void setRefreshTime(int);
-    void setLife(int);
+    LinkList<Point> &GetBody();
+    LinkList<Point> *GetBodyAddr();
+    int GetDirection();
+    int GetTryDirection();
+    int GetRefreshTime();
+    int GetLife();
+    void SetDirection(int);
+    void SetTryDirection(int);
+    void SetRefreshTime(int);
+    void SetLife(int);
     Snake();
     Snake(Point);
-    Point position();
-    void appendBody(Point);
-    void move(Point);
-    void move(Point, int, int);
-    void clear(Point);
+    Point Position();
+    void AppendBody(Point);
+    void Move(Point);
+    void Move(Point, int, int);
+    void Clear(Point);
 };
 
 class Game{
 public:
-    Background background;
-    LinkList<Snake> snakeList;
+    Background background;      //存放地图类
+    LinkList<Snake> snakeList;  //存放蛇的链表（多人游戏）
     bool showFigure = true;
     bool showAudio = true;
     bool penetrate = true;
     int lived_snakes = 1;
-    int snakeMove(Snake&, Point);
-    void reInit();
+    int SnakeMove(Snake&, Point);
+    void ReInit();
 };
 
 

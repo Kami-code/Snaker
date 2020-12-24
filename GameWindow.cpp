@@ -66,13 +66,13 @@ WindowMap::WindowMap(){
 }
 
 WindowMap::WindowMap(Game* game, Point a, Point b) {
-    init(game, a, b);
+    Init(game, a, b);
 }
 
-void WindowMap::init(Game* game, Point a, Point b) {
+void WindowMap::Init(Game* game, Point a, Point b) {
     gameAddr = game;
-    gameWidth = (*game).background.getWidth();
-    gameHeight = (*game).background.getHeight();
+    gameWidth = (*game).background.GetWidth();
+    gameHeight = (*game).background.GetHeight();
     left = a.x;
     up = a.y;
     right = b.x;
@@ -90,13 +90,13 @@ void WindowMap::init(Game* game, Point a, Point b) {
  * Description: Draw the gamewindow interface, which contains grids, snakes, foods, and walls.
  * This function is called by GameWindow::paintEvent.
  */
-void WindowMap::draw(QPainter *painter) { /*绘制游戏界面，被paintEvent调用*/
+void WindowMap::Draw(QPainter *painter) { /*绘制游戏界面，被paintEvent调用*/
     (*painter).setRenderHint(QPainter::Antialiasing);
     (*painter).translate(left, up);
     //painter.scale(side / 200.0, side / 200.0);
     for (int i = 0; i < gameWidth; i ++) {
         for (int j = 0; j < gameHeight; j ++) {
-            int status = (*gameAddr).background.getGround()[i][j] % 100;
+            int status = (*gameAddr).background.GetGround()[i][j] % 100;
             if (status == 0) {
                 if (game.showFigure)
                 (*painter).setPen(QColor(255,255,255,255));
@@ -126,8 +126,8 @@ void WindowMap::draw(QPainter *painter) { /*绘制游戏界面，被paintEvent�
 
     int cnt = 0;
     while (head != NULL) {
-        ListNode<Point> *header = (head->data).getBody().head->next;
-        if (head->data.getLife() < 0) continue;
+        ListNode<Point> *header = (head->data).GetBody().head->next;
+        if (head->data.GetLife() < 0) continue;
         while (header != NULL) {
             if (!game.showFigure) {
                 (*painter).drawRect(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth,unitHeight);
@@ -147,12 +147,12 @@ void WindowMap::draw(QPainter *painter) { /*绘制游戏界面，被paintEvent�
  *          a – point of window where the mouse click.
  * Description: Get the index of the game.ground and plus one(change the ground status).
  */
-void WindowMap::leftClicked(Point a){
+void WindowMap::LeftClicked(Point a){
     if (a.x < left || a.x > right || a.y < up || a.y > down) return;
     int rowIndex = (a.y - up) / unitHeight;
     int colIndex = (a.x - left) / unitWidth;
     qDebug() << "change [" <<rowIndex << "][" << colIndex <<"]" << Qt::endl;
-    (*gameAddr).background.getGround()[colIndex][rowIndex] ++;
+    (*gameAddr).background.GetGround()[colIndex][rowIndex] ++;
 }
 
 /*
@@ -202,7 +202,7 @@ GameWindow::GameWindow(QWidget *parent)
     ct = new QPushButton(this);
     ct->setText("存档");
     ct->move(QPoint(150, 50));
-    connect(ct, &QPushButton::released, this, &GameWindow::save);
+    connect(ct, &QPushButton::released, this, &GameWindow::Save);
 
 //    for (int i = 0; i < 100; i++) {
 //        timer[i] = new QTimer(this);
@@ -212,9 +212,9 @@ GameWindow::GameWindow(QWidget *parent)
     timer[0] = new QTimer(this);
     timer[1] = new QTimer(this);
     timer[2] = new QTimer(this);
-    connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess0)); //定周期调用move函数
-    connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess1)); //定周期调用move函数
-    connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess2)); //定周期调用move函数
+    connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess0)); //定周期调用move函数
+    connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess1)); //定周期调用move函数
+    connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess2)); //定周期调用move函数
     stopped = true; //一开始蛇静止
     QTimer* timer2 = new QTimer(this); //不需要写为成员变量，自动消亡
     connect(timer2, &QTimer::timeout, this, QOverload<>::of(&GameWindow::update)); //定周期刷新界面
@@ -235,7 +235,7 @@ void GameWindow::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         Point nowPos = Point(event->pos());
-        windowMap.leftClicked(nowPos);
+        windowMap.LeftClicked(nowPos);
         //将当前鼠标点击的数据插入到主要数据数组中
         update();        //调用绘图函数
     }
@@ -277,8 +277,8 @@ void GameWindow::keyPressEvent(QKeyEvent * event) {
     ListNode<Snake> *head = game.snakeList.head->next;
     int cnt = 1;
     while (head != NULL) {
-        if (direction[min(3, cnt)] != 0)(head->data).setTryDirection(direction[min(3, cnt)]);
-        else (head->data).setTryDirection((head->data).getTryDirection());
+        if (direction[min(3, cnt)] != 0)(head->data).SetTryDirection(direction[min(3, cnt)]);
+        else (head->data).SetTryDirection((head->data).GetTryDirection());
         head = head->next;
         cnt++;
     }
@@ -315,26 +315,26 @@ void GameWindow::ChangeToSaverWindow()
 
 int onTimeOut(Snake& snakeLocal) //定时器事件触发绑定
 {
-    if (snakeLocal.getLife() <= 0) return -5;
-    int tryDirection = snakeLocal.getTryDirection();
+    if (snakeLocal.GetLife() <= 0) return -5;
+    int tryDirection = snakeLocal.GetTryDirection();
     int afterstatus = 0;
     if (tryDirection == 1) {
-        afterstatus = game.snakeMove(snakeLocal, Point(0, -1));
+        afterstatus = game.SnakeMove(snakeLocal, Point(0, -1));
     }
     else if (tryDirection == 2){
-        afterstatus = game.snakeMove(snakeLocal, Point(-1, 0));
+        afterstatus = game.SnakeMove(snakeLocal, Point(-1, 0));
     }
     else if (tryDirection == 3){
-        afterstatus = game.snakeMove(snakeLocal, Point(0, 1));
+        afterstatus = game.SnakeMove(snakeLocal, Point(0, 1));
     }
     else if (tryDirection == 4){
-        afterstatus = game.snakeMove(snakeLocal, Point(1, 0));
+        afterstatus = game.SnakeMove(snakeLocal, Point(1, 0));
     }
     if (afterstatus == -4) {
-        snakeLocal.setTryDirection(snakeLocal.getDirection());
+        snakeLocal.SetTryDirection(snakeLocal.GetDirection());
         return onTimeOut(snakeLocal);
     }
-    snakeLocal.setDirection(tryDirection);
+    snakeLocal.SetDirection(tryDirection);
     qDebug() << "afterstatus = " << afterstatus << Qt::endl;
     return afterstatus;
 }
@@ -344,7 +344,7 @@ long long getCurrentTime()
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
-void GameWindow::timelyAccess() {
+void GameWindow::TimelyAccess() {
 
     QString m_ObjectName = sender()->objectName();
     qDebug() << "sender is :" << m_ObjectName << Qt::endl;
@@ -357,13 +357,13 @@ void GameWindow::timelyAccess() {
     }
     ListNode<Snake> *head = game.snakeList.Find(index - 2);
     Snake &snakeLocal = head->data;
-    timer[index]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
-    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
-        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
-        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+    timer[index]->start(snakeLocal.GetRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
+        snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
             game.lived_snakes --;
-            while (snakeLocal.getBody().getCurrentLength() > 0) {
-                snakeLocal.getBody().Delete();
+            while (snakeLocal.GetBody().GetCurrentLength() > 0) {
+                snakeLocal.GetBody().Delete();
             }
             timer[index]->stop();
         }
@@ -375,17 +375,17 @@ void GameWindow::timelyAccess() {
     }
     update();
 }
-void GameWindow::timelyAccess0() {
+void GameWindow::TimelyAccess0() {
     //long long int now_time = getCurrentTime();
     ListNode<Snake> *head = game.snakeList.head->next;
     Snake &snakeLocal = head->data;
-    timer[0]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
-    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
-        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
-        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+    timer[0]->start(snakeLocal.GetRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
+        snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
             game.lived_snakes --;
-            while (snakeLocal.getBody().getCurrentLength() > 0) {
-                snakeLocal.getBody().Delete();
+            while (snakeLocal.GetBody().GetCurrentLength() > 0) {
+                snakeLocal.GetBody().Delete();
             }
             timer[0]->stop();
         }
@@ -399,29 +399,29 @@ void GameWindow::timelyAccess0() {
     update();
 }
 
-void GameWindow::timelyAccess1() {
+void GameWindow::TimelyAccess1() {
     if (game.snakeList.head->next->next == NULL) return;
     ListNode<Snake> *head = game.snakeList.head->next->next;
     Snake &snakeLocal = head->data;
-    timer[1]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
-    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
-        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
-        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+    timer[1]->start(snakeLocal.GetRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
+        snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
             game.lived_snakes --;
-            while (snakeLocal.getBody().getCurrentLength() > 0) {
-                snakeLocal.getBody().Delete();
+            while (snakeLocal.GetBody().GetCurrentLength() > 0) {
+                snakeLocal.GetBody().Delete();
             }
             timer[1]->stop();
         }
         else {
-            int length = snakeLocal.getBody().getCurrentLength();
-            while (snakeLocal.getBody().getCurrentLength() > 0) {
-                snakeLocal.getBody().Delete();
+            int length = snakeLocal.GetBody().GetCurrentLength();
+            while (snakeLocal.GetBody().GetCurrentLength() > 0) {
+                snakeLocal.GetBody().Delete();
             }
             for (int i = 0; i < length; i++) {
-                snakeLocal.getBody().Insert(Point(0,i));
-                snakeLocal.setDirection(1);
-                snakeLocal.setTryDirection(1);
+                snakeLocal.GetBody().Insert(Point(0,i));
+                snakeLocal.SetDirection(1);
+                snakeLocal.SetTryDirection(1);
             }
 
         }
@@ -434,18 +434,18 @@ void GameWindow::timelyAccess1() {
     update();
 }
 
-void GameWindow::timelyAccess2() {
+void GameWindow::TimelyAccess2() {
     if (game.snakeList.head->next->next == NULL) return;
     if (game.snakeList.head->next->next->next == NULL) return;
     ListNode<Snake> *head = game.snakeList.head->next->next->next;
     Snake &snakeLocal = head->data;
-    timer[2]->start(snakeLocal.getRefreshTime()); /*更新刷新时间*/
-    if (onTimeOut(snakeLocal) < 0 && snakeLocal.getLife() > 0){
-        snakeLocal.setLife(snakeLocal.getLife() - 1); /*这条蛇的生命值-1*/
-        if (snakeLocal.getLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
+    timer[2]->start(snakeLocal.GetRefreshTime()); /*更新刷新时间*/
+    if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
+        snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
+        if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
             game.lived_snakes --;
-            while (snakeLocal.getBody().getCurrentLength() > 0) {
-                snakeLocal.getBody().Delete();
+            while (snakeLocal.GetBody().GetCurrentLength() > 0) {
+                snakeLocal.GetBody().Delete();
             }
             timer[2]->stop();
         }
@@ -458,7 +458,7 @@ void GameWindow::timelyAccess2() {
     update();
 }
 
-void GameWindow::save(){
+void GameWindow::Save(){
     timer[0]->stop();
     timer[1]->stop();
     timer[2]->stop();
@@ -468,8 +468,8 @@ void GameWindow::save(){
 void GameWindow::paintEvent(QPaintEvent *)
 {
     QPainter painter(this); //创建painter，绑定此窗口
-    windowMap.init(&game, Point(80,0), Point(560,480)); //绑定game,设置左上角和右下角
-    windowMap.draw(&painter); //绑定painter
+    windowMap.Init(&game, Point(80,0), Point(560,480)); //绑定game,设置左上角和右下角
+    windowMap.Draw(&painter); //绑定painter
 
 
 }

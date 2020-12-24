@@ -18,10 +18,10 @@ private:
 public:
     Saver();
     Saver(Game*);
-    int getSaverNumber();
-    bool getSaved(int);
-    void setSaved(int, bool);
-    void load(int, Game*);
-    void save(int, Game*);
+    int GetSaverNumber();
+    bool GetSaved(int);
+    void SetSaved(int, bool);
+    void Load(int, Game*);
+    void Save(int, Game*);
 };
 #endif // SAVER_H

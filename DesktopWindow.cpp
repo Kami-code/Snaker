@@ -99,7 +99,7 @@ void MainWidget::changeToGameWindow()
 {
     desktopSound.stop();
     if(game.showAudio)gameWindowSound.play();
-    game.reInit();
+    game.ReInit();
     this->hide();
     gameWindow->show();
     gameOverWindow->hide();

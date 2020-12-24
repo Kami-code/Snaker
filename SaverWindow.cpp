@@ -23,56 +23,56 @@ SaverWindow::SaverWindow(QWidget *parent)
     returnButton = new QPushButton(this);
     returnButton->move(QPoint(300, 460));
     returnButton->setText("返回游戏");
-    connect(returnButton, &QPushButton::clicked, this, &SaverWindow::changeToGameWindow);
+    connect(returnButton, &QPushButton::clicked, this, &SaverWindow::ChangeToGameWindow);
 
     saverbutton[0] = new QPushButton(this);
     saverbutton[0]->move(QPoint(300, 220));
-    if (saver.getSaved(0) == false) saverbutton[0]->setText("保存存档0");
+    if (saver.GetSaved(0) == false) saverbutton[0]->setText("保存存档0");
     else saverbutton[0]->setText("读取存档0");
-    connect(saverbutton[0], &QPushButton::clicked, this, &SaverWindow::loadSaver0);
+    connect(saverbutton[0], &QPushButton::clicked, this, &SaverWindow::LoadSaver0);
 
     saverbutton[1]= new QPushButton(this);
     saverbutton[1]->move(QPoint(300, 300));
-    if (saver.getSaved(1) == false) saverbutton[1]->setText("保存存档1");
+    if (saver.GetSaved(1) == false) saverbutton[1]->setText("保存存档1");
     else saverbutton[1]->setText("读取存档1");
-    connect(saverbutton[1], &QPushButton::clicked, this, &SaverWindow::loadSaver1);
+    connect(saverbutton[1], &QPushButton::clicked, this, &SaverWindow::LoadSaver1);
 
     saverbutton[2] = new QPushButton(this);
     saverbutton[2]->move(QPoint(300, 380));
-    if (saver.getSaved(2) == false) saverbutton[2]->setText("保存存档2");
+    if (saver.GetSaved(2) == false) saverbutton[2]->setText("保存存档2");
     else saverbutton[2]->setText("读取存档2");
-    connect(saverbutton[2], &QPushButton::clicked, this, &SaverWindow::loadSaver2);
+    connect(saverbutton[2], &QPushButton::clicked, this, &SaverWindow::LoadSaver2);
 }
 
 
 
 
 
-void SaverWindow::loadSaver0() {
-    if (saver.getSaved(0) == false) {
-        saver.save(0, &game);
-        saver.setSaved(0, true);
+void SaverWindow::LoadSaver0() {
+    if (saver.GetSaved(0) == false) {
+        saver.Save(0, &game);
+        saver.SetSaved(0, true);
     }
-    else {saver.load(0, &game);}
-    if (saver.getSaved(0) == false) saverbutton[0]->setText("保存存档0");
+    else {saver.Load(0, &game);}
+    if (saver.GetSaved(0) == false) saverbutton[0]->setText("保存存档0");
     else saverbutton[0]->setText("读取存档0");
 }
-void SaverWindow::loadSaver1() {
-    if (saver.getSaved(1) == false) {
-        saver.save(1, &game);
-        saver.setSaved(1, true);
+void SaverWindow::LoadSaver1() {
+    if (saver.GetSaved(1) == false) {
+        saver.Save(1, &game);
+        saver.SetSaved(1, true);
     }
-    else {saver.load(1, &game);}
-    if (saver.getSaved(1) == false) saverbutton[1]->setText("保存存档1");
+    else {saver.Load(1, &game);}
+    if (saver.GetSaved(1) == false) saverbutton[1]->setText("保存存档1");
     else saverbutton[1]->setText("读取存档1");
 }
-void SaverWindow::loadSaver2() {
-    if (saver.getSaved(2) == false) {
-        saver.save(2, &game);
-        saver.setSaved(2, true);
+void SaverWindow::LoadSaver2() {
+    if (saver.GetSaved(2) == false) {
+        saver.Save(2, &game);
+        saver.SetSaved(2, true);
     }
-    else {saver.load(2, &game);}
-    if (saver.getSaved(2) == false) saverbutton[2]->setText("保存存档2");
+    else {saver.Load(2, &game);}
+    if (saver.GetSaved(2) == false) saverbutton[2]->setText("保存存档2");
     else saverbutton[2]->setText("读取存档2");
 }
 
@@ -84,7 +84,7 @@ void SaverWindow::ChangeToDesktop(){
     emit SignalChangeToDesktop();
 }
 
-void SaverWindow::changeToGameWindow(){
+void SaverWindow::ChangeToGameWindow(){
     emit SignalChangeToGameWindow();
 }
 

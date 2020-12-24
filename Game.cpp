@@ -12,14 +12,14 @@ Background::Background() {
     ground[2][2] = 1;
 }
 
-void Background::clearGround() { //在width被删除前
+void Background::ClearGround() { //在width被删除前
     for (int i = 0; i < width; ++i ) {
         delete ground[i];
     }
     delete ground;
 }
 
-void Background::setGround() {
+void Background::SetGround() {
 
     ground = new int*[width];
     for (int i = 0; i < width; ++i ) {
@@ -29,16 +29,16 @@ void Background::setGround() {
     ground[2][2] = 1;
 }
 
-int Background::getWidth() {return width;}
-int Background::getHeight(){return height;}
-int **Background::getGround(){return ground;}
-void Background::setHeight(int a){height = a;}
-void Background::setWidth(int a){width = a;}
+int Background::GetWidth() {return width;}
+int Background::GetHeight(){return height;}
+int **Background::GetGround(){return ground;}
+void Background::SetHeight(int a){height = a;}
+void Background::SetWidth(int a){width = a;}
 Background& Background::operator = (const Background& a) {
     width = a.width;
     height = a.height;
-    clearGround();
-    setGround();
+    ClearGround();
+    SetGround();
     for (int i = 0; i < width; ++i ) {
         for (int j = 0; j < height; ++j) ground[i][j] = a.ground[i][j];
     }
@@ -67,77 +67,77 @@ Snake& Snake::operator = (const Snake& right) {
 
 //void Snake
 
-Point Snake::position() {
+Point Snake::Position() {
     return bodyList.head->next->data;
 }
 
-int Snake::getDirection() {return direction;}
-int Snake::getTryDirection() {return trySetDirection;}
-int Snake::getRefreshTime() {return refreshTime;}
-int Snake::getLife() {return life;}
-void Snake::setDirection(int d) {direction = d;}
-void Snake::setTryDirection(int d) {trySetDirection = d;}
-void Snake::setRefreshTime(int d) {refreshTime = d;}
-void Snake::setLife(int d) {life = d;}
+int Snake::GetDirection() {return direction;}
+int Snake::GetTryDirection() {return trySetDirection;}
+int Snake::GetRefreshTime() {return refreshTime;}
+int Snake::GetLife() {return life;}
+void Snake::SetDirection(int d) {direction = d;}
+void Snake::SetTryDirection(int d) {trySetDirection = d;}
+void Snake::SetRefreshTime(int d) {refreshTime = d;}
+void Snake::SetLife(int d) {life = d;}
 
-void Snake::appendBody(Point targetPos){
+void Snake::AppendBody(Point targetPos){
     ListNode<Point>* targetNode = new ListNode<Point>(targetPos, NULL);
     bodyList.Insert(targetNode, 1);
 }
 
-void Snake::move(Point movePos) {
-    Point nowPos = position();
+void Snake::Move(Point movePos) {
+    Point nowPos = Position();
     Point targetPos =nowPos.move(movePos);
     ListNode<Point>* targetNode = new ListNode<Point>(targetPos, NULL);
     bodyList.Insert(targetNode, 1);
     bodyList.Delete();
 }
 
-void Snake::move(Point movePos, int width, int height) {
-    Point nowPos = position();
+void Snake::Move(Point movePos, int width, int height) {
+    Point nowPos = Position();
     Point targetPos =nowPos.move(movePos, width, height);
     ListNode<Point>* targetNode = new ListNode<Point>(targetPos, NULL);
     bodyList.Insert(targetNode, 1);
     bodyList.Delete();
 }
 
-void Snake::clear(Point a = Point(1,1)) {
-    while (bodyList.getCurrentLength() != 0) bodyList.Delete();
-    bodyList.setCurrentLength(0);
+void Snake::Clear(Point a = Point(1,1)) {
+    while (bodyList.GetCurrentLength() != 0) bodyList.Delete();
+    bodyList.SetCurrentLength(0);
     ListNode<Point> *head = new ListNode<Point>(a, NULL);
     bodyList.Insert(head);
 }
 
-LinkList<Point> &Snake::getBody(){
+LinkList<Point> &Snake::GetBody(){
     return bodyList;
 }
 
-LinkList<Point> *Snake::getBodyAddr(){
+LinkList<Point> *Snake::GetBodyAddr(){
     return &bodyList;
 }
 
 
 
-int Game::snakeMove(Snake& snakeLocal, Point movePos) {
+int Game::SnakeMove(Snake& snakeLocal, Point movePos) {
     //----------------------multi------------------
-    LinkList<Point> &snakeBody_ = snakeLocal.getBody();
+    LinkList<Point> &snakeBody_ = snakeLocal.GetBody();
     snakeBody_.Show();
-    Point nowPos_ = snakeLocal.position();
+    Point nowPos_ = snakeLocal.Position();
     Point targetPos_ =nowPos_.move(movePos);
     /*check vaild*/
-    if (targetPos_.x >= background.getWidth() || targetPos_.y >= background.getHeight() || targetPos_.x < 0 || targetPos_.y < 0) {
+    if (targetPos_.x >= background.GetWidth() || targetPos_.y >= background.GetHeight() || targetPos_.x < 0 || targetPos_.y < 0) {
         if (!penetrate) {
             snakeLocal.errorStatus = -3;
             return -3; //如果要去的地方是边界，返回-3， 未完成要写场景穿透和游戏失败的情况
         }
         else {
-            if (targetPos_.x < 0) targetPos_.x +=  background.getWidth();
-            if (targetPos_.y < 0) targetPos_.y +=  background.getHeight();
-            targetPos_.x %= background.getWidth();
-            targetPos_.y %= background.getHeight();
+            if (targetPos_.x < 0) targetPos_.x +=  background.GetWidth();
+            if (targetPos_.y < 0) targetPos_.y +=  background.GetHeight();
+            targetPos_.x %= background.GetWidth();
+            targetPos_.y %= background.GetHeight();
         }
     }
-    int status_ = background.getGround()[targetPos_.x][targetPos_.y];
+    int status_ = background.GetGround()[targetPos_.x][targetPos_.y];
     if (status_%100 == 0) { //场地为空地的情况
         ListNode<Point>* head_ = snakeBody_.head->next;
         int cnt = 0;
@@ -162,29 +162,29 @@ int Game::snakeMove(Snake& snakeLocal, Point movePos) {
     status = 4 减速食物， 速度-10%（刷新时间+10%）
     */
     else if (status_%100 == 1 || status_%100 == 2 || status_%100 == 3 ||status_%100 == 4){
-        snakeLocal.appendBody(targetPos_); //加到蛇头
-        int **ground = background.getGround();
+        snakeLocal.AppendBody(targetPos_); //加到蛇头
+        int **ground = background.GetGround();
         ListNode<Point>* head_ = snakeBody_.head->next;
         while (head_ != NULL) {
             ground[head_->data.x][head_->data.y] += 100;
             head_ = head_->next;
         }
         while (1) {
-            int randx = rand() % (background.getWidth()), randy = rand() % (background.getHeight());
-            if (background.getGround()[randx][randy] != 0) continue;
-            background.getGround()[randx][randy] = rand() % 4 + 1; //刷新出四种食物
+            int randx = rand() % (background.GetWidth()), randy = rand() % (background.GetHeight());
+            if (background.GetGround()[randx][randy] != 0) continue;
+            background.GetGround()[randx][randy] = rand() % 4 + 1; //刷新出四种食物
             break;
         }
         if (status_ % 100 == 2) {
-            snakeLocal.setLife(snakeLocal.getLife() + 1);
+            snakeLocal.SetLife(snakeLocal.GetLife() + 1);
         }
         if (status_ % 100 == 3) {
-            snakeLocal.setRefreshTime(int(0.5 * snakeLocal.getRefreshTime()));
+            snakeLocal.SetRefreshTime(int(0.5 * snakeLocal.GetRefreshTime()));
         }
         if (status_ % 100== 4) {
-            snakeLocal.setRefreshTime(int(1.2 * snakeLocal.getRefreshTime()));
+            snakeLocal.SetRefreshTime(int(1.2 * snakeLocal.GetRefreshTime()));
         }
-        background.getGround()[targetPos_.x][targetPos_.y] = 0; //先刷新再吃掉食物，以免刷在蛇头重叠处出现Bug
+        background.GetGround()[targetPos_.x][targetPos_.y] = 0; //先刷新再吃掉食物，以免刷在蛇头重叠处出现Bug
         if(showAudio)QSound::play(":/audio/audio/eatnormal.wav");
         snakeLocal.errorStatus = 1;
         return 1;
@@ -194,22 +194,22 @@ int Game::snakeMove(Snake& snakeLocal, Point movePos) {
         snakeLocal.errorStatus = -1;//场地上不是纯地面 未完成，需要处理食物的情况
         return -1;
     }
-    snakeLocal.move(movePos, background.getWidth(), background.getHeight());
+    snakeLocal.Move(movePos, background.GetWidth(), background.GetHeight());
     qDebug() << "snake[" << &snakeLocal << "] move to （ " << movePos.x << " , " << movePos.y << " ) " << Qt::endl;
     snakeLocal.errorStatus = 0;
     return 0;
 
 }
 
-void Game::reInit(){
-    background.clearGround();
-    background.setGround();
+void Game::ReInit(){
+    background.ClearGround();
+    background.SetGround();
     ListNode<Snake> *head = snakeList.head->next;
     while (head != NULL) {
         Snake &snake = head->data;
-        snake.clear();
-        snake.setTryDirection(4);
-        snake.setDirection(4);
+        snake.Clear();
+        snake.SetTryDirection(4);
+        snake.SetDirection(4);
         snake.errorStatus = 0;
         head = head->next;
     }

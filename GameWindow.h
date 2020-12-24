@@ -76,9 +76,9 @@ private:
 public:
     WindowMap();
     WindowMap(Game *, Point, Point);
-    void init(Game *, Point, Point);
-    void draw( QPainter *painter);
-    void leftClicked(Point);            /*屏幕被点击的情况，通过反映射找出*/
+    void Init(Game *, Point, Point);
+    void Draw( QPainter *painter);
+    void LeftClicked(Point);            /*屏幕被点击的情况，通过反映射找出*/
     Resource resource;                  /*绑定界面资源文件*/
 };
 
@@ -94,11 +94,11 @@ public:
     void ChangeToGameOverWindow();
     void ChangeToSaverWindow();
     void GameStopped();
-    void timelyAccess();
-    void timelyAccess0();
-    void timelyAccess1();
-    void timelyAccess2();
-    void save();
+    void TimelyAccess();
+    void TimelyAccess0();
+    void TimelyAccess1();
+    void TimelyAccess2();
+    void Save();
 signals:
     /*
      * 信号必须要signals关键字来声明

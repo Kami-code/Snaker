@@ -56,8 +56,8 @@ public:
     void Delete(int);
     void Show() const;
     void Show(int, int) const;
-    int getCurrentLength() const;
-    void setCurrentLength(int);
+    int GetCurrentLength() const;
+    void SetCurrentLength(int);
 };
 
 //模板类的实现要写在.h文件中
@@ -65,7 +65,7 @@ public:
 template<typename T>
 LinkList<T>& LinkList<T>::operator = (const LinkList<T>& right) {
     while(currentLength != 0) (*this).Delete();
-    for (int i = 1; i <= right.getCurrentLength(); ++i) {
+    for (int i = 1; i <= right.GetCurrentLength(); ++i) {
         (*this).Insert((right.Find(i)->data)); //一定要插入元素，这样才可以新开内存，插入指针会导致析构的时候出问题
     }
     return (*this);
@@ -79,12 +79,12 @@ LinkList<T>::LinkList() {
 }
 
 template<typename T>
-int LinkList<T>::getCurrentLength() const{
+int LinkList<T>::GetCurrentLength() const{
     return currentLength;
 }
 
 template<typename T>
-void LinkList<T>::setCurrentLength(int d){
+void LinkList<T>::SetCurrentLength(int d){
     currentLength = d;
 }
 

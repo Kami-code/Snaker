@@ -52,19 +52,19 @@ SettingWindow::SettingWindow(QWidget *parent)
 
 void SettingWindow::SetSnakes(int nums) {
     game.lived_snakes = nums;
-    while (nums > game.snakeList.getCurrentLength()) {
+    while (nums > game.snakeList.GetCurrentLength()) {
         Snake* aa = new Snake(Point(1,1));
         game.snakeList.Insert(*aa);
     }
-    while (nums < game.snakeList.getCurrentLength()) game.snakeList.Delete();
+    while (nums < game.snakeList.GetCurrentLength()) game.snakeList.Delete();
 }
 
 
 void SettingWindow::SetBackgroundSize(int nums) {
-    game.background.clearGround();
-    game.background.setHeight(nums);
-    game.background.setWidth(nums);
-    game.background.setGround();
+    game.background.ClearGround();
+    game.background.SetHeight(nums);
+    game.background.SetWidth(nums);
+    game.background.SetGround();
 }
 
 SettingWindow::~SettingWindow()

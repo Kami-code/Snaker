@@ -16,10 +16,10 @@ public:
     ~SaverWindow();
 
     void ChangeToDesktop();
-    void loadSaver0();
-    void loadSaver1();
-    void loadSaver2();
-    void changeToGameWindow();
+    void LoadSaver0();
+    void LoadSaver1();
+    void LoadSaver2();
+    void ChangeToGameWindow();
 
 signals:
     /**
