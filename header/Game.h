@@ -10,6 +10,7 @@
 #include <vector>
 #include "LinkList.h"
 
+#define maxSnake 10
 
 /* 定义场地的主类，这部分需要独立于图形界面，提供游戏的接口。Move()*/
 class Background{
@@ -18,6 +19,7 @@ private:
     int height = 30;            //场景纵向网格格子数
     Point **ground = NULL;        //二维数组，存放网格状态
 public:
+
     Background();
     void ClearGround();
     void CleanSnakeGround();
@@ -27,6 +29,7 @@ public:
     int GetWidth();
     int GetHeight();
     bool IsConfined(Point);
+    Point GetRandomVaildPoint();
     Point GetStatus(Point);
     Point CreateFood();         //创造出食物
     Point ** GetGround();
@@ -46,6 +49,7 @@ private:
     int trySetDirection = 4;        //存放尝试方向
     int refreshTime = 50;           //存放刷新率
     int life = 3;                   //存放剩余生命值
+    int score = 0;                  //存放得分
 public:
     Snake& operator = (const Snake&);
     int errorStatus = 0;
@@ -55,17 +59,19 @@ public:
     int GetTryDirection();
     int GetRefreshTime();
     int GetLife();
+    int GetScore();
     void SetDirection(int);
     void SetTryDirection(int);
     void SetRefreshTime(int);
     void SetLife(int);
+    void SetScore(int);
     Snake();
     Snake(Point);
     Point Position();
     void AppendBody(Point);
     void Move(Point);
     void Move(Point, int, int);
-    void Clear(Point);
+    void Clear(Background*,Point);
     pair<pair<float,float>,pair<float,float>> GetMeanAndVariance(Point);
 };
 

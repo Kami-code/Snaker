@@ -4,11 +4,11 @@
 #define RESOURCE_H
 
 #include <QPainter>
+#include "header/Game.h"
 
 class Resource{
 public:
     QPixmap* character,* food;
-    int size = 50;
     void init();
     Resource();
 };

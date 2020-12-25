@@ -49,13 +49,31 @@ Point Background::FindFood() {
             }
         }
     }
+    if (ans == 0) return Point(-1,-1);
     ans = rand() % ans + 1;
     for (int i = 0; i < width; ++i ) {
         for (int j = 0; j < height; ++j) {
-
             if (ground[i][j].x != 0 && ground[i][j].y == 0) {
                 tmp++;
                 if (tmp == ans) return Point(i,j);
+            }
+        }
+    }
+    return Point(-1,-1);
+}
+
+Point Background::GetRandomVaildPoint() {
+    int upper_bound = 500;
+    for (int i = 0 ; i < upper_bound; ++i) {
+        Point randomPoint(rand() % width, rand() % height);
+        if (ground[randomPoint.x][randomPoint.y].x == 0 && ground[randomPoint.x][randomPoint.y].y == 0) {
+            return randomPoint;
+        }
+    }
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < height; ++j) {
+            if (ground[i][j].x == 0 && ground[i][j].y == 0) {
+                return Point(i,j);
             }
         }
     }
@@ -68,8 +86,8 @@ Point Background::GetStatus(Point localPoint){
 }
 
 Point Background::CreateFood() { //O(N^2)
-    int randx = rand() % width, randy = rand() % height;
-    Point randPoint(randx, randy);
+    srand(time(NULL));
+    Point randPoint(rand() % width, rand() % height);
     bool **visited;
     visited = new bool*[width];
     for (int i = 0; i < width; ++i ) {
@@ -87,13 +105,19 @@ Point Background::CreateFood() { //O(N^2)
     while (pointSet.empty() != true) {
         Point nowPoint = pointSet.front();
         pointSet.pop();
-        if ((GetStatus(nowPoint).x || GetStatus(nowPoint).y) == 0) {
+        if (GetStatus(nowPoint).x  == 0 && GetStatus(nowPoint).y == 0) {
             randPoint = nowPoint;
             break;
         }
-
+        int permutation[4] = {1,2,3,4};
+        for(int i = 0; i < 4; ++i) {
+            int tmp = permutation[i];
+            int indexRandom = rand() % 4;
+            permutation[i] = permutation[indexRandom];
+            permutation[indexRandom] = tmp;
+        }
         for (int i = 0; i < 4; ++i) {
-            Point nextPoint = nowPoint + tmp[i];
+            Point nextPoint = nowPoint + tmp[permutation[i]];
             if (IsConfined(nextPoint) == true && visited[nextPoint.x][nextPoint.y] == false) {
                 pointSet.push(nextPoint);
                 visited[nextPoint.x][nextPoint.y] = true;
@@ -101,7 +125,7 @@ Point Background::CreateFood() { //O(N^2)
         }
     }
     //别忘了visited的析构
-    for (int i = 0; i < width; ++i ) delete visited[i]; delete visited;
+    for (int i = 0; i < width; ++i ) { delete visited[i];} delete visited;
     int score = rand() % 100;
     /*
     x = 1 普通食物
@@ -109,17 +133,22 @@ Point Background::CreateFood() { //O(N^2)
     x = 3 加速食物，速度+10%（刷新时间-10%）
     x = 4 减速食物，速度-10%（刷新时间+10%）
     */
+    enum food {
+        normal = 1,
+        oneMoreLife = 2,
+        speedUp = 3,
+        speedDown = 4,
+    };
     if (score < 60) {
-        ground[randx][randy].x = 1;
+        ground[randPoint.x][randPoint.y].x = normal;
     }
     else if (score < 90) {
-        ground[randx][randy].x = 3;
+        ground[randPoint.x][randPoint.y].x = speedUp;
     }
     else if (score < 98) {
-        ground[randx][randy].x = 4;
+        ground[randPoint.x][randPoint.y].x = speedDown;
     }
-    else ground[randx][randy].x = 2;
-
+    else ground[randPoint.x][randPoint.y].x = oneMoreLife;
     return randPoint;
 }
 
@@ -159,8 +188,6 @@ Snake& Snake::operator = (const Snake& right) {
     return (*this);
 }
 
-//void Snake
-
 Point Snake::Position() {
     return bodyList.head->next->data;
 }
@@ -169,10 +196,12 @@ int Snake::GetDirection() {return direction;}
 int Snake::GetTryDirection() {return trySetDirection;}
 int Snake::GetRefreshTime() {return refreshTime;}
 int Snake::GetLife() {return life;}
+int Snake::GetScore() {return score;}
 void Snake::SetDirection(int d) {direction = d;}
 void Snake::SetTryDirection(int d) {trySetDirection = d;}
 void Snake::SetRefreshTime(int d) {refreshTime = d;}
 void Snake::SetLife(int d) {life = d;}
+void Snake::SetScore(int d) {score = d;}
 
 void Snake::AppendBody(Point targetPos){
     ListNode<Point>* targetNode = new ListNode<Point>(targetPos, NULL);
@@ -195,9 +224,9 @@ void Snake::Move(Point movePos, int width, int height) {
     bodyList.Delete();
 }
 
-void Snake::Clear(Point a = Point(1,1)) {
+void Snake::Clear(Background *background = NULL,Point a = Point(1,1)){
+    if (background != NULL) a = background->GetRandomVaildPoint();
     while (bodyList.GetCurrentLength() != 0) bodyList.Delete();
-    bodyList.SetCurrentLength(0);
     ListNode<Point> *head = new ListNode<Point>(a, NULL);
     bodyList.Insert(head);
 }
@@ -287,29 +316,37 @@ int Game::SnakeMove(Snake& snakeLocal, Point movePos, bool MoveFlag) {
     status = 4 减速食物，速度-10%（刷新时间+10%）
     */
     else if (status.x == 1 || status.x == 2 || status.x == 3 ||status.x == 4){
+        enum food {
+            normal = 1,
+            oneMoreLife = 2,
+            speedUp = 3,
+            speedDown = 4,
+        };
         if (!MoveFlag) return 1;
         snakeLocal.AppendBody(targetPos_); //加到蛇头
-        //background.CreateFood();
-        while (1) {
-            int randx = rand() % (background.GetWidth()), randy = rand() % (background.GetHeight());
-            Point randPoint(randx, randy);
-            Point randPointStatus(background.GetStatus(randPoint));
-            if (randPointStatus.x != 0 || randPointStatus.y != 0) continue;
-            background.GetGround()[randx][randy].x = rand() % 4 + 1; //刷新出四种食物
-            break;
+
+        switch (status.x)
+        {
+            case normal:
+                //if(setting.GetShowAudio())QSound::play(":/audio/audio/delicious.wav");
+                break;
+            case oneMoreLife:
+                snakeLocal.SetLife(snakeLocal.GetLife() + 1);
+                //if(setting.GetShowAudio())QSound::play(":/audio/audio/delicious.wav");
+                break;
+            case speedUp:
+                snakeLocal.SetRefreshTime(int(0.8 * snakeLocal.GetRefreshTime()));
+                //if(setting.GetShowAudio())QSound::play(":/audio/audio/speedup.wav");
+                break;
+            case speedDown:
+                snakeLocal.SetRefreshTime(int(1.2 * snakeLocal.GetRefreshTime()));
+                //if(setting.GetShowAudio())QSound::play(":/audio/audio/speeddown.wav");
+                break;
         }
-        if (status.x == 2) {
-            snakeLocal.SetLife(snakeLocal.GetLife() + 1);
-        }
-        if (status.x == 3) {
-            snakeLocal.SetRefreshTime(int(0.5 * snakeLocal.GetRefreshTime()));
-        }
-        if (status.x == 4) {
-            snakeLocal.SetRefreshTime(int(1.2 * snakeLocal.GetRefreshTime()));
-        }
+        background.CreateFood();
         background.GetGround()[targetPos_.x][targetPos_.y].x = 0; //先刷新再吃掉食物，以免刷在蛇头重叠处出现Bug
-        //if(setting.GetShowAudio())QSound::play(":/audio/audio/eatnormal.wav");
         snakeLocal.errorStatus = 1;
+        snakeLocal.SetScore(snakeLocal.GetScore() + 1);
         return 1;
     }
 
@@ -324,14 +361,13 @@ int Game::SnakeMove(Snake& snakeLocal, Point movePos, bool MoveFlag) {
 void Game::ReInit(){
     background.ClearGround();
     background.SetGround();
-    ListNode<Snake> *head = snakeList.head->next;
-    while (head != NULL) {
-        Snake &snake = head->data;
-        snake.Clear();
-        snake.SetTryDirection(4);
-        snake.SetDirection(4);
-        snake.errorStatus = 0;
-        head = head->next;
+    ListNode<Snake> *localSnake = snakeList.head->next;
+    while (localSnake != NULL) {
+        localSnake->data.Clear(&background);
+        localSnake->data.SetTryDirection(4);
+        localSnake->data.SetDirection(4);
+        localSnake->data.errorStatus = 0;
+        localSnake = localSnake->next;
     }
 
 

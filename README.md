@@ -11,9 +11,9 @@
 
 ![avatar](https://github.com/Kami-code/Snaker/raw/master/GameWindow.png?raw=true)
 
-  ![avatar](https://github.com/Kami-code/Snaker/raw/master/SettingWindow.png?raw=true)
+![avatar](https://github.com/Kami-code/Snaker/raw/master/SettingWindow.png?raw=true)
 
-  ![avatar](https://github.com/Kami-code/Snaker/raw/master/SaverWindow.png?raw=true)
+![avatar](https://github.com/Kami-code/Snaker/raw/master/SaverWindow.png?raw=true)
 
 ## 二、系统设计
 

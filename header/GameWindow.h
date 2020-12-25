@@ -76,6 +76,7 @@ public:
     WindowMap();
     WindowMap(Game *, Point, Point);
     void Init(Game *, Point, Point);
+    void ChangePoint(Point, Point);
     void Draw( QPainter *painter);
     void LeftClicked(Point);            /*屏幕被点击的情况，通过反映射找出*/
     Resource resource;                  /*绑定界面资源文件*/
@@ -94,18 +95,8 @@ public:
     void ChangeToSaverWindow();
     void GameStopped();
     void TimelyAccess();
-    void TimelyAccess0();
-    void TimelyAccess1();
-    void TimelyAccess2();
     void Save();
 signals:
-    /*
-     * 信号必须要signals关键字来声明
-     * 信号没有返回值, 但可以有参数
-     * 信号就是函数的声明, 无需定义
-     * 使用: emit mySignal();
-     * 信号可以被重载
-     */
     void SignalChangeToDesktop();
     void SignalChangeToGameOverWindow();
     void SignalChangeToSaverWindow();
@@ -113,6 +104,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+    void resizeEvent(QResizeEvent* size) override;
 public slots:
     //void onTimeOut();
 
@@ -120,7 +112,7 @@ private:
 
     QPushButton * at,*bt, *ct;
     WindowMap windowMap;
-    QTimer *timer[102];
+    vector<QTimer*> timerVector;
     int timeCount = 0;
     bool stopped = true;
 };

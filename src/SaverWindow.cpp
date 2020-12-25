@@ -5,9 +5,6 @@
 #include "header/GameWindow.h"
 #include "header/SaverWindow.h"
 
-
-
-
 extern Game game;
 extern Saver saver;
 

@@ -14,7 +14,6 @@ private:
     Game savedGame[3];
     bool saved[3];
     int saverNumber = 0;
-    //Setting setting;
 public:
     Saver();
     int GetSaverNumber();
