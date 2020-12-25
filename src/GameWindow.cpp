@@ -46,16 +46,16 @@ void WindowMap::Draw(QPainter *painter) { /*绘制游戏界面，被paintEvent�
     //painter.scale(side / 200.0, side / 200.0);
     for (int i = 0; i < gameWidth; i ++) {
         for (int j = 0; j < gameHeight; j ++) {
-            int status = (*gameAddr).background.GetGround()[i][j] % 100;
-            if (status == 0) {
-                if (game.showFigure)
-                (*painter).setPen(QColor(255,255,255,255));
+            int status = (*gameAddr).background.GetGround()[i][j].x;
+            if (status == 0) { //场地为空地的情况
+                if (game.setting.GetShowFigure())
+                    (*painter).setPen(QColor(255,255,255,255));
                 else (*painter).setPen(QColor(0,0,0,255));
                 (*painter).setBrush(Qt::NoBrush);
                 (*painter).drawRect(unitWidth * i,unitHeight * j,unitWidth , unitHeight);/*绘制网格*/
             }
-            else {
-                if (!game.showFigure) {
+            else { //场地为食物的情况
+                if (!game.setting.GetShowFigure()) {
                     (*painter).setPen(QColor(222,222,222,128));
                     (*painter).setBrush(QColor(0,255,255,128));
                     (*painter).drawRect(unitWidth * i,unitHeight * j,unitWidth , unitHeight);
@@ -79,7 +79,7 @@ void WindowMap::Draw(QPainter *painter) { /*绘制游戏界面，被paintEvent�
         ListNode<Point> *header = (head->data).GetBody().head->next;
         if (head->data.GetLife() < 0) continue;
         while (header != NULL) {
-            if (!game.showFigure) {
+            if (!game.setting.GetShowFigure()) {
                 (*painter).drawRect(unitWidth * header->data.x, unitHeight * header->data.y,unitWidth,unitHeight);
             }
             else {
@@ -102,7 +102,7 @@ void WindowMap::LeftClicked(Point a){
     int rowIndex = (a.y - up) / unitHeight;
     int colIndex = (a.x - left) / unitWidth;
     qDebug() << "change [" <<rowIndex << "][" << colIndex <<"]" << Qt::endl;
-    (*gameAddr).background.GetGround()[colIndex][rowIndex] ++;
+    (*gameAddr).background.GetGround()[colIndex][rowIndex].x ++;
 }
 
 /*
@@ -154,17 +154,19 @@ GameWindow::GameWindow(QWidget *parent)
     ct->move(QPoint(150, 50));
     connect(ct, &QPushButton::released, this, &GameWindow::Save);
 
-//    for (int i = 0; i < 100; i++) {
-//        timer[i] = new QTimer(this);
-//        timer[i]->setObjectName(QString(i));
-//        connect(timer[i], &QTimer::timeout, this, QOverload<>::of(&GameWindow::timelyAccess)); //定周期调用move函数
-//    }
-    timer[0] = new QTimer(this);
-    timer[1] = new QTimer(this);
-    timer[2] = new QTimer(this);
-    connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess0)); //定周期调用move函数
-    connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess1)); //定周期调用move函数
-    connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess2)); //定周期调用move函数
+    for (int i = 0; i < 5; i++) {
+        timer[i] = new QTimer(this);
+        timer[i]->setObjectName(QString(i));
+        qDebug() << timer[i]->objectName() << endl;
+        connect(timer[i], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess)); //定周期调用move函数
+        timer[i]->stop();
+    }
+    //timer[0] = new QTimer(this);
+    //timer[1] = new QTimer(this);
+    //timer[2] = new QTimer(this);
+    //connect(timer[0], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess0)); //定周期调用move函数
+    //connect(timer[1], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess1)); //定周期调用move函数
+    //connect(timer[2], &QTimer::timeout, this, QOverload<>::of(&GameWindow::TimelyAccess2)); //定周期调用move函数
     stopped = true; //一开始蛇静止
     QTimer* timer2 = new QTimer(this); //不需要写为成员变量，自动消亡
     connect(timer2, &QTimer::timeout, this, QOverload<>::of(&GameWindow::update)); //定周期刷新界面
@@ -250,7 +252,7 @@ void GameWindow::ChangeToDesktop()
 void GameWindow::ChangeToGameOverWindow()
 {
     emit SignalChangeToGameOverWindow();
-    if(game.showAudio)QSound::play(":/audio/audio/failure2.wav");
+    if(game.setting.GetShowAudio())QSound::play(":/audio/audio/failure2.wav");
     qDebug()  << "emit gameover!";
 }
 
@@ -262,10 +264,25 @@ void GameWindow::ChangeToSaverWindow()
     emit SignalChangeToSaverWindow();
 }
 
+extern int AIsnakeMove(Snake &, Background*);
 
 int onTimeOut(Snake& snakeLocal) //定时器事件触发绑定
 {
     if (snakeLocal.GetLife() <= 0) return -5;
+
+    ListNode <Snake> *nowSnake = game.snakeList.head->next;
+    game.background.CleanSnakeGround();
+    while (nowSnake != NULL) {
+        ListNode <Point> *nowPoint = nowSnake->data.GetBody().head->next;
+        while (nowPoint != NULL) {
+            game.background.GetGround()[nowPoint->data.x][nowPoint->data.y].y = 1;
+            nowPoint = nowPoint->next;
+        }
+        nowSnake = nowSnake->next;
+    }
+
+
+    snakeLocal.SetTryDirection(AIsnakeMove(snakeLocal, &game.background) + 1);
     int tryDirection = snakeLocal.GetTryDirection();
     int afterstatus = 0;
     if (tryDirection == 1) {
@@ -285,7 +302,7 @@ int onTimeOut(Snake& snakeLocal) //定时器事件触发绑定
         return onTimeOut(snakeLocal);
     }
     snakeLocal.SetDirection(tryDirection);
-    qDebug() << "afterstatus = " << afterstatus << Qt::endl;
+    //qDebug() << "afterstatus = " << afterstatus << Qt::endl;
     return afterstatus;
 }
 
@@ -301,24 +318,30 @@ void GameWindow::TimelyAccess() {
     qDebug() << "need sender is :" << timer[0] << Qt::endl;
     int index = 0;
     while (1) {
-        qDebug() << "while sender is :" << timer[index]->objectName() << Qt::endl;
+        qDebug() << "enumrate sender is :" << timer[index]->objectName() << Qt::endl;
         if (m_ObjectName == timer[index++]->objectName()) break;
-
     }
-    ListNode<Snake> *head = game.snakeList.Find(index - 2);
+    qDebug() << "index = " << index <<endl;
+    if (index > game.snakeList.GetCurrentLength()) {
+        timer[index]->stop();
+        return;
+    }
+    ListNode<Snake> *head = game.snakeList.Find(index + 1);
     Snake &snakeLocal = head->data;
     timer[index]->start(snakeLocal.GetRefreshTime()); /*更新刷新时间*/
     if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
         snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
         if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
-            game.lived_snakes --;
+            game.setting.SetLivedSnakeNumber(game.setting.GetLivedSnakeNumber() - 1);
             while (snakeLocal.GetBody().GetCurrentLength() > 0) {
                 snakeLocal.GetBody().Delete();
             }
-            timer[index]->stop();
+            if (game.setting.GetShowAudio()) QSound::play(":/audio/audio/death.wav");
+            timer[index - 1]->start(500);
+            timer[index - 1]->stop();
         }
     }
-    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+    if (game.setting.GetLivedSnakeNumber() == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
         ChangeToGameOverWindow();
         stopped = true;
         return;
@@ -333,14 +356,15 @@ void GameWindow::TimelyAccess0() {
     if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
         snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
         if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
-            game.lived_snakes --;
+            game.setting.SetLivedSnakeNumber(game.setting.GetLivedSnakeNumber() - 1);
             while (snakeLocal.GetBody().GetCurrentLength() > 0) {
                 snakeLocal.GetBody().Delete();
             }
+            if (game.setting.GetShowAudio()) QSound::play(":/audio/audio/death.wav");
             timer[0]->stop();
         }
     }
-    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+    if (game.setting.GetLivedSnakeNumber() == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
         ChangeToGameOverWindow();
         stopped = true;
         return;
@@ -357,7 +381,7 @@ void GameWindow::TimelyAccess1() {
     if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
         snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
         if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
-            game.lived_snakes --;
+            game.setting.SetLivedSnakeNumber(game.setting.GetLivedSnakeNumber() - 1);
             while (snakeLocal.GetBody().GetCurrentLength() > 0) {
                 snakeLocal.GetBody().Delete();
             }
@@ -368,15 +392,16 @@ void GameWindow::TimelyAccess1() {
             while (snakeLocal.GetBody().GetCurrentLength() > 0) {
                 snakeLocal.GetBody().Delete();
             }
+            if (game.setting.GetShowAudio()) QSound::play(":/audio/audio/death.wav");
             for (int i = 0; i < length; i++) {
-                snakeLocal.GetBody().Insert(Point(0,i));
-                snakeLocal.SetDirection(1);
-                snakeLocal.SetTryDirection(1);
+                snakeLocal.GetBody().Insert(Point(0,-i));
+                snakeLocal.SetDirection(4);
+                snakeLocal.SetTryDirection(4);
             }
 
         }
     }
-    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+    if (game.setting.GetLivedSnakeNumber() == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
         ChangeToGameOverWindow();
         stopped = true;
         return;
@@ -393,14 +418,15 @@ void GameWindow::TimelyAccess2() {
     if (onTimeOut(snakeLocal) < 0 && snakeLocal.GetLife() > 0){
         snakeLocal.SetLife(snakeLocal.GetLife() - 1); /*这条蛇的生命值-1*/
         if (snakeLocal.GetLife() <= 0) { /*第一次探测到死亡时，存活蛇-1，并且蛇本体全部删除*/
-            game.lived_snakes --;
+            game.setting.SetLivedSnakeNumber(game.setting.GetLivedSnakeNumber() - 1);
             while (snakeLocal.GetBody().GetCurrentLength() > 0) {
                 snakeLocal.GetBody().Delete();
             }
+            if (game.setting.GetShowAudio()) QSound::play(":/audio/audio/death.wav");
             timer[2]->stop();
         }
     }
-    if (game.lived_snakes == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
+    if (game.setting.GetLivedSnakeNumber() == 0) { /*如果游戏中的蛇全部死亡，进入结算界面*/
         ChangeToGameOverWindow();
         stopped = true;
         return;
@@ -417,9 +443,16 @@ void GameWindow::Save(){
 
 void GameWindow::paintEvent(QPaintEvent *)
 {
+    ListNode<Snake> *localSnake = game.snakeList.head->next;
+    if (stopped == false) {
+        int count = 0;
+        while (localSnake != NULL) {
+            if (localSnake->data.GetLife() <= 0) timer[count]->stop();
+            localSnake = localSnake->next;
+            count++;
+        }
+    }
     QPainter painter(this); //创建painter，绑定此窗口
     windowMap.Init(&game, Point(80,0), Point(560,480)); //绑定game,设置左上角和右下角
     windowMap.Draw(&painter); //绑定painter
-
-
 }

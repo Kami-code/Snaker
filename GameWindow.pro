@@ -12,6 +12,7 @@ HEADERS       = \
     header/SaverWindow.h \
     header/SettingWindow.h
 SOURCES       = \
+                src/Algorithm.cpp \
                 src/DesktopWindow.cpp \
                 src/Game.cpp \
                 src/GameOverWindow.cpp \

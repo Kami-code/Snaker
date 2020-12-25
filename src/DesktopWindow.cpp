@@ -11,8 +11,8 @@ extern Saver saver;
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent), desktopSound(":/audio/audio/desktop.wav"), gameWindowSound(":/audio/audio/fight.wav")
 {
-    if(game.showAudio)desktopSound.play();
-    if (game.showFigure){
+    if(game.setting.GetShowAudio())desktopSound.play();
+    if (game.setting.GetShowFigure()){
         QPalette pal = this->palette();
         pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/title.jpg")));
         setPalette(pal);
@@ -24,33 +24,25 @@ MainWidget::MainWidget(QWidget *parent)
     bt1 = new QPushButton(this);
     bt1->setText("关闭窗口");
     bt1->move(QPoint(50, 150));
-
-    /**
-     * bt1: 信号发出者, 指针类型
-     * &QPushButton::pressed: 信号的发射  &发送者的类名::信号名字
-     * this: 信号接受者, 指针类型
-     * &MainWidget::close: 信号的处理  &接收的类名::槽名字
-     *
-     */
     connect(bt1, &QPushButton::pressed, this, &MainWidget::close); //点击关闭窗口后关闭
 
 
     bt3 = new QPushButton(this);
     bt3->setText("进入游戏");
     bt3->move(QPoint(150, 150));
-    connect(bt3, &QPushButton::released, this, &MainWidget::changeToGameWindow);
+    connect(bt3, &QPushButton::released, this, &MainWidget::ChangeToGameWindow);
 
 
 
     bt4 = new QPushButton(this);
     bt4->setText("游戏设置");
     bt4->move(QPoint(150, 350));
-    connect(bt4, &QPushButton::released, this, &MainWidget::changeWindowToSettingWindow);
+    connect(bt4, &QPushButton::released, this, &MainWidget::ChangeToSettingWindow);
 
     bt5 = new QPushButton(this);
     bt5->setText("读取存档");
     bt5->move(QPoint(150, 450));
-    connect(bt5, &QPushButton::released, this, &MainWidget::changeWindowToSaverWindow);
+    connect(bt5, &QPushButton::released, this, &MainWidget::ChangeToSaverWindow);
 
     gameWindow = new GameWindow();
     gameOverWindow = new GameOverWindow();
@@ -65,10 +57,10 @@ MainWidget::MainWidget(QWidget *parent)
     void (GameWindow::*funSignal6)() = &GameWindow::SignalChangeToSaverWindow;
     void (SaverWindow::*funSingal7)() = &SaverWindow::SignalChangeToGameWindow;
 
-    void (MainWidget::*Desktop)() = &MainWidget::changeWindowToDesktop;
-    void (MainWidget::*GameOverWindow)() = &MainWidget::changeToGameOverWindow;
-    void (MainWidget::*SaverWindow)() = &MainWidget::changeWindowToSaverWindow;
-    void (MainWidget::* NoInitGameWindow)() = &MainWidget::changeToGameWindowWithNoInit;
+    void (MainWidget::*Desktop)() = &MainWidget::ChangeToDesktopWindow;
+    void (MainWidget::*GameOverWindow)() = &MainWidget::ChangeToGameOverWindow;
+    void (MainWidget::*SaverWindow)() = &MainWidget::ChangeToSaverWindow;
+    void (MainWidget::* NoInitGameWindow)() = &MainWidget::ChangeToGameWindowWithNoInit;
 
     connect(gameWindow, funSignal2, this, GameOverWindow);
     connect(gameWindow, funSignal1, this, Desktop);
@@ -81,24 +73,14 @@ MainWidget::MainWidget(QWidget *parent)
 
 MainWidget::~MainWidget()
 {
-    // 直接或间接继承于QObject的对象, 在释放的内存的时候, 会自动调用析构函数, 释放子对象的内存
-    // 故QPushButton bt1 bt2 bt3 bt4 会随着QWidget MainWidget的释放而自动调用子对象的析构函数, 释放子对象的内存
-}
 
-void MainWidget::myButtonReleasedSlot()
-{
-    if (bt2 != nullptr)
-    {
-        bt2->setText("发送信号, 槽处理完成 ...");
-    }
 }
 
 
-
-void MainWidget::changeToGameWindow()
+void MainWidget::ChangeToGameWindow()
 {
     desktopSound.stop();
-    if(game.showAudio)gameWindowSound.play();
+    if(game.setting.GetShowAudio())gameWindowSound.play();
     game.ReInit();
     this->hide();
     gameWindow->show();
@@ -107,10 +89,10 @@ void MainWidget::changeToGameWindow()
     saverWindow->hide();
 }
 
-void MainWidget::changeToGameWindowWithNoInit()
+void MainWidget::ChangeToGameWindowWithNoInit()
 {
     desktopSound.stop();
-    if(game.showAudio)gameWindowSound.play();
+    if(game.setting.GetShowAudio())gameWindowSound.play();
     this->hide();
     gameWindow->show();
     gameOverWindow->hide();
@@ -118,7 +100,7 @@ void MainWidget::changeToGameWindowWithNoInit()
     saverWindow->hide();
 }
 
-void MainWidget::changeToGameOverWindow()
+void MainWidget::ChangeToGameOverWindow()
 {
     desktopSound.stop();
     gameWindowSound.stop();
@@ -129,7 +111,7 @@ void MainWidget::changeToGameOverWindow()
     saverWindow->hide();
 }
 
-void MainWidget::changeWindowToSettingWindow()
+void MainWidget::ChangeToSettingWindow()
 {
     desktopSound.stop();
     gameWindowSound.stop();
@@ -140,7 +122,7 @@ void MainWidget::changeWindowToSettingWindow()
     saverWindow->hide();
 }
 
-void MainWidget::changeWindowToSaverWindow()
+void MainWidget::ChangeToSaverWindow()
 {
     desktopSound.stop();
     gameWindowSound.stop();
@@ -151,10 +133,10 @@ void MainWidget::changeWindowToSaverWindow()
     saverWindow->show();
 }
 
-void MainWidget::changeWindowToDesktop()
+void MainWidget::ChangeToDesktopWindow()
 {
     gameWindowSound.stop();
-    if(game.showAudio)desktopSound.play();
+    if(game.setting.GetShowAudio())desktopSound.play();
     this->show();
     gameWindow->hide();
     gameOverWindow->hide();

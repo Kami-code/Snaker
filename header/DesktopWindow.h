@@ -25,13 +25,12 @@ public:
 signals:
 
 public slots:
-    void myButtonReleasedSlot();
-    void changeToGameWindow();
-    void changeToGameOverWindow();
-    void changeWindowToSettingWindow();
-    void changeWindowToSaverWindow();
-    void changeWindowToDesktop();
-    void changeToGameWindowWithNoInit();
+    void ChangeToGameWindow();
+    void ChangeToGameOverWindow();
+    void ChangeToSettingWindow();
+    void ChangeToSaverWindow();
+    void ChangeToDesktopWindow();
+    void ChangeToGameWindowWithNoInit();
 private:
     //Ui::MainWidgetClass ui;
 

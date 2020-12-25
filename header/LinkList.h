@@ -24,8 +24,12 @@ public:
         return Point(x + movePos.x, y + movePos.y);
     }
     ostream& operator << (ostream &);
+    Point operator + (const Point &) const;
+    Point operator - (const Point &) const;
     bool operator > (const Point &) const;
     bool operator < (const Point &) const;
+    bool operator == (const Point &) const;
+
 };
 
 
@@ -159,6 +163,7 @@ void LinkList<T>::Delete(int index) {
 
 template<typename T>
 void LinkList<T>::Show() const{
+    return;
     if (head == NULL) {
         qDebug() << "head = null" <<  Qt::endl;
         return;

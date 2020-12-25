@@ -16,16 +16,21 @@ class Background{
 private:
     int width = 30;             //场景横向网格格子数
     int height = 30;            //场景纵向网格格子数
-    int **ground = NULL;        //二维数组，存放网格状态
+    Point **ground = NULL;        //二维数组，存放网格状态
 public:
     Background();
     void ClearGround();
+    void CleanSnakeGround();
     void SetGround();
     void SetWidth(int);
     void SetHeight(int);
     int GetWidth();
     int GetHeight();
-    int ** GetGround();
+    bool IsConfined(Point);
+    Point GetStatus(Point);
+    Point CreateFood();         //创造出食物
+    Point ** GetGround();
+    Point FindFood();
     Background& operator = (const Background&);
 };
 
@@ -34,7 +39,7 @@ public:
  * Move()
  */
 
-class Snake{
+class  Snake{
 private:
     LinkList<Point> bodyList;       //存放每个关节的结点
     int direction = 4;              //存放真实方向
@@ -61,17 +66,32 @@ public:
     void Move(Point);
     void Move(Point, int, int);
     void Clear(Point);
+    pair<pair<float,float>,pair<float,float>> GetMeanAndVariance(Point);
+};
+
+class Setting{
+private:
+    bool showFigure = true;
+    bool showAudio = true;
+    bool penetrableness = true;
+    int livedSnakeNumber = 1;
+public:
+    bool GetShowFigure();
+    bool GetShowAudio();
+    bool GetPenetrableness();
+    int GetLivedSnakeNumber();
+    void SetShowFigure(bool);
+    void SetShowAudio(bool);
+    void SetPenetrableness(bool);
+    void SetLivedSnakeNumber(int);
 };
 
 class Game{
 public:
     Background background;      //存放地图类
     LinkList<Snake> snakeList;  //存放蛇的链表（多人游戏）
-    bool showFigure = true;
-    bool showAudio = true;
-    bool penetrate = true;
-    int lived_snakes = 1;
-    int SnakeMove(Snake&, Point);
+    Setting setting;
+    int SnakeMove(Snake&, Point, bool MoveFlag = true);
     void ReInit();
 };
 

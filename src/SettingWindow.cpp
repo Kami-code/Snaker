@@ -51,10 +51,12 @@ SettingWindow::SettingWindow(QWidget *parent)
 }
 
 void SettingWindow::SetSnakes(int nums) {
-    game.lived_snakes = nums;
+    game.setting.SetLivedSnakeNumber(nums);
+    int count = 1;
     while (nums > game.snakeList.GetCurrentLength()) {
-        Snake* aa = new Snake(Point(1,1));
+        Snake* aa = new Snake(Point(5 * count,5 * count));
         game.snakeList.Insert(*aa);
+        count++;
     }
     while (nums < game.snakeList.GetCurrentLength()) game.snakeList.Delete();
 }
@@ -78,16 +80,16 @@ void SettingWindow::ChangeToDesktop()
 
 void SettingWindow::ChangeAudioSetting()
 {
-    game.showAudio = !game.showAudio;
-    if (game.showAudio == false) audioButton->setText("打开音效");
+    game.setting.SetShowAudio(!game.setting.GetShowAudio());
+    if (game.setting.GetShowAudio() == false) audioButton->setText("打开音效");
     else audioButton->setText("关闭音效");
     update();
 }
 
 void SettingWindow::ChangeFigureSetting()
 {
-    game.showFigure = !game.showFigure;
-    if (game.showFigure == false) figureButton->setText("打开图形");
+    game.setting.SetShowFigure(!game.setting.GetShowFigure());
+    if (game.setting.GetShowFigure() == false) figureButton->setText("打开图形");
     else figureButton->setText("关闭图形");
     update();
 }

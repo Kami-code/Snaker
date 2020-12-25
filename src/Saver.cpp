@@ -4,10 +4,6 @@ Saver::Saver(){
     saved[0] = false;saved[1] = false;saved[2] = false;
 }
 
-Saver::Saver(Game* gameAddr){
-    background[0] = (*gameAddr).background;
-    //snakeList[0] = (*gameAddr).snakeList;
-}
 
 int Saver::GetSaverNumber(){
     return saverNumber;
@@ -24,9 +20,9 @@ void Saver::SetSaved(int index, bool setting) {
 void Saver::Save(int index, Game* gameAddr) {
     //
     //snake->data.getBody().Show();
-    background[index] = (*gameAddr).background; /*得到背景*/
+    savedGame[index].background = (*gameAddr).background; /*得到背景*/
 
-    while (snakeList[index].GetCurrentLength() != 0) snakeList[index].Delete();
+    while (savedGame[index].snakeList.GetCurrentLength() != 0) savedGame[index].snakeList.Delete();
 
     ListNode<Snake> *firstSnake = (*gameAddr).snakeList.head->next;
     while (firstSnake != NULL) { /*处理每条蛇的情况*/
@@ -46,7 +42,7 @@ void Saver::Save(int index, Game* gameAddr) {
         localSnake.GetBody().Show();
         qDebug() << "end saving!"<< Qt::endl;
         ListNode<Snake> *tmpNode = new ListNode<Snake>(localSnake, NULL);
-        snakeList[index].Insert(tmpNode);
+        savedGame[index].snakeList.Insert(tmpNode);
         firstSnake = firstSnake->next;
     }
 
@@ -55,11 +51,11 @@ void Saver::Save(int index, Game* gameAddr) {
 }
 
 void Saver::Load(int index, Game* gameAddr) {
-    (*gameAddr).background = background[index];
+    (*gameAddr).background = savedGame[index].background;
 
     while ((*gameAddr).snakeList.GetCurrentLength() != 0) (*gameAddr).snakeList.Delete();
 
-    ListNode<Snake> *firstSnake = snakeList[index].head->next;
+    ListNode<Snake> *firstSnake = savedGame[index].snakeList.head->next;
     while (firstSnake != NULL) { /*处理每条蛇的情况*/
         Snake localSnake;
         localSnake.SetLife(firstSnake->data.GetLife());
