@@ -46,5 +46,6 @@
         <file>image/head9.png</file>
         <file>image/head10.png</file>
         <file>image/head11.png</file>
+        <file>image/wall.png</file>
     </qresource>
 </RCC>

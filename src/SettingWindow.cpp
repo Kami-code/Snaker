@@ -18,8 +18,14 @@ SettingWindow::SettingWindow(QWidget *parent)
     QPalette pal = this->palette();
     pal.setBrush(QPalette::Background, QBrush(QPixmap(":/image/image/title3.jpg")));
     setPalette(pal);
+
+    aiSnakeButton = new QPushButton(this);
+    aiSnakeButton->move(QPoint(300, 300));
+    ChangeAISnakeSetting();
+    connect(aiSnakeButton, &QPushButton::clicked, this, &SettingWindow::ChangeAISnakeSetting); //被点击的时候发射信号
+
     audioButton = new QPushButton(this);
-    audioButton->move(QPoint(300, 300));
+    audioButton->move(QPoint(300, 340));
     ChangeAudioSetting();ChangeAudioSetting(); //显示正确的文字
     connect(audioButton, &QPushButton::clicked, this, &SettingWindow::ChangeAudioSetting); //被点击的时候发射信号
 
@@ -27,6 +33,11 @@ SettingWindow::SettingWindow(QWidget *parent)
     figureButton->move(QPoint(300, 380));
     ChangeFigureSetting();ChangeFigureSetting(); //显示正确的文字
     connect(figureButton, &QPushButton::clicked, this, &SettingWindow::ChangeFigureSetting); //被点击的时候发射信号
+
+    penetrateButton = new QPushButton(this);
+    penetrateButton->move(QPoint(300, 420));
+    ChangePenetrateSetting();ChangePenetrateSetting(); //显示正确的文字
+    connect(penetrateButton, &QPushButton::clicked, this, &SettingWindow::ChangePenetrateSetting);
 
     returnButton = new QPushButton(this);
     returnButton->move(QPoint(300, 460));
@@ -36,6 +47,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     QTextBrowser *textBrowser = new QTextBrowser(this);
     textBrowser->setText("蛇的数量");
     textBrowser->move(150,200);
+    textBrowser->setSizeAdjustPolicy(textBrowser->AdjustToContents);
     textBrowser->setStyleSheet("background:transparent;border-width:0;border-style:outset");
     QSpinBox *pSpinBox = new QSpinBox(this);
     pSpinBox->setMinimum(1);  // 最小值
@@ -56,6 +68,7 @@ SettingWindow::SettingWindow(QWidget *parent)
     QTextBrowser *textBrowser2 = new QTextBrowser(this);
     textBrowser2->setText("地图大小");
     textBrowser2->move(150,250);
+    textBrowser2->setSizeAdjustPolicy(textBrowser2->AdjustToContents);
     textBrowser2->setStyleSheet("background:transparent;border-width:0;border-style:outset");
     QSpinBox *pSpinBox2 = new QSpinBox(this);
     pSpinBox2->setMinimum(10);  // 最小值
@@ -67,23 +80,15 @@ SettingWindow::SettingWindow(QWidget *parent)
     slider2->move(300,250);
     slider2->setMinimum(10); //设置最小值
     slider2->setMaximum(100);  //设置最大值
-    slider2->setValue(10); //设置滑动条控件的值
+    slider2->setValue(50); //设置滑动条控件的值
     connect(slider2,&QSlider::valueChanged,this,&SettingWindow::SetBackgroundSize);//用鼠标按下滑块并移动时触发信号,自动传递一个值：当前值
     connect(slider2, SIGNAL(valueChanged(int)), pSpinBox2, SLOT(setValue(int)));
     connect(pSpinBox2,SIGNAL(valueChanged(int)),slider2,SLOT(setValue(int)));
 }
 
 void SettingWindow::SetSnakes(int nums) {
-    game.setting.SetLivedSnakeNumber(nums);
-    int count = 1;
-    while (game.snakeList.GetCurrentLength() != 0) game.snakeList.Delete();
-    while (game.snakeList.GetCurrentLength() != nums) {
-        Point headPoint = game.background.GetRandomVaildPoint();
-        Snake* aa = new Snake(headPoint);
-        game.background.GetGround()[headPoint.x][headPoint.y].y = 1;
-        game.snakeList.Insert(*aa);
-        count++;
-    }
+    game.setting.SetSnakeNumber(nums);
+
 }
 
 
@@ -116,5 +121,22 @@ void SettingWindow::ChangeFigureSetting()
     game.setting.SetShowFigure(!game.setting.GetShowFigure());
     if (game.setting.GetShowFigure() == false) figureButton->setText("打开图形");
     else figureButton->setText("关闭图形");
+    update();
+}
+
+void SettingWindow::ChangePenetrateSetting()
+{
+    game.setting.SetPenetrableness(!game.setting.GetPenetrableness());
+    if (game.setting.GetPenetrableness() == false) penetrateButton->setText("允许穿透");
+    else penetrateButton->setText("禁止穿透");
+    update();
+}
+
+void SettingWindow::ChangeAISnakeSetting()
+{
+    game.setting.SetAISnakeMode();
+    if (game.setting.GetAiSnakeMode() == 0) aiSnakeButton->setText("人机对战");
+    else if(game.setting.GetAiSnakeMode() == 1) aiSnakeButton->setText("AI对战");
+    else aiSnakeButton->setText("真人对战");
     update();
 }

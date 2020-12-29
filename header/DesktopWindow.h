@@ -14,13 +14,15 @@
 #include "SaverWindow.h"
 
 
-class MainWidget : public QWidget
+class DesktopWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
-    ~MainWidget();
+    explicit DesktopWindow(QWidget *parent = 0);
+    void InitButton();      //按键初始化
+    void InitWindow();      //界面、信号和槽初始化
+    ~DesktopWindow();
 
 signals:
 
@@ -34,11 +36,10 @@ public slots:
 private:
     //Ui::MainWidgetClass ui;
 
-    QPushButton * bt1;
-    QPushButton * bt2;
-    QPushButton * bt3;
-    QPushButton * bt4;
-    QPushButton * bt5;
+    QPushButton * closeButton;
+    QPushButton * enterGameButton;
+    QPushButton * settingButton;
+    QPushButton * saverButton;
 
     QSound desktopSound;
     QSound gameWindowSound;

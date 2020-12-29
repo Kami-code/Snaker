@@ -2,6 +2,7 @@ QT += widgets
 QT+= multimedia
 
 HEADERS       = \
+    header/Algorithm.h \
     header/DesktopWindow.h \
     header/Game.h \
     header/GameOverWindow.h \

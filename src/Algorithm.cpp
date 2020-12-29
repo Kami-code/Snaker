@@ -1,13 +1,4 @@
-#include <iostream>
-#include <queue>
-#include <map>
-#include "header/Game.h"
-#include "header/LinkList.h"
-
-bool IsConfined(Point localPoint, int width, int height) {
-    if (localPoint.x < 0 || localPoint.x >= width || localPoint.y < 0 || localPoint.y >= height) return false;
-    return true;
-}
+#include "header/Algorithm.h"
 
 void PrintPoint(Point localPoint, string s = "") {
     qDebug() << QString::fromStdString(s) <<":(" << localPoint.x << "," << localPoint.y << ")" << Qt::endl;
@@ -19,11 +10,13 @@ bool BFS (Point startPoint, Point endPoint, Background* background, map <Point, 
     bool **visited;
     int width = background->GetWidth();
     int height = background->GetHeight();
+    //初始化visited数组
     visited = new bool*[width];
     for (int i = 0; i < width; ++i ) {
         visited[i] = new bool [height];
         for (int j = 0; j < height; ++j) {
-            if (background->GetGround()[i][j].y == 0) visited[i][j] = false;
+            if (background->GetGround()[i][j].y == 0 && background->GetGround()[i][j].x != 1) visited[i][j] = false;
+            //不存在蛇，也不存在墙的情况下，才允许visit
             else visited[i][j] = true;
         }
     }
@@ -38,24 +31,22 @@ bool BFS (Point startPoint, Point endPoint, Background* background, map <Point, 
         Point nowPoint = pointSet.front();
         pointSet.pop();
         if (nowPoint == endPoint) {isFind = true; break;} //找到了对应的路
-
         for (int i = 0; i < 4; ++i) {
-            Point nextPoint = nowPoint + tmp[i];
-
-            if (IsConfined(nextPoint, width, height) == true && visited[nextPoint.x][nextPoint.y] == false) {
+            Point nextPoint = nowPoint + tmp[i]; //产生上下左右的点的集合
+            if (background->IsConfined(nextPoint) == true && visited[nextPoint.x][nextPoint.y] == false) {
                 fatherMap[nextPoint] = nowPoint;
-
-                pointSet.push(nextPoint);
+                pointSet.push(nextPoint);  //加入到队列中
                 visited[nextPoint.x][nextPoint.y] = true;
             }
         }
     }
+    while (pointSet.empty() != true) {pointSet.pop();}
     //别忘了visited的析构
     for (int i = 0; i < width; ++i ) {
         delete visited[i];
     }
     delete visited;
-    return isFind;
+    return isFind; //返回是否找到路径
 }
 
 float GetNorm(int snakeLength){
@@ -70,16 +61,15 @@ float GetNorm(int snakeLength){
             ans += (i) * (i);
         }
     }
-
     return sqrt(2) * sqrt(ans / snakeLength);
 }
 
 extern Game game;
 
-int AIsnakeMove(Snake & localSnake, Background* background) {
+int AIsnakeMove(Snake & localSnake, Background* background) { //处理AI蛇的决策
     map <Point, Point> fatherMap;
     Point startPoint = localSnake.GetBody().head->next->data; //蛇头位置
-    Point endPoint = background->FindFood();
+    Point endPoint = background->FindFood(localSnake.GetID(), localSnake.GetBody().GetCurrentLength());
 
     BFS(startPoint, endPoint, background, fatherMap);
     if (fatherMap.count(endPoint) != 0) {
@@ -87,40 +77,29 @@ int AIsnakeMove(Snake & localSnake, Background* background) {
             endPoint = fatherMap[endPoint];
         }
     }
+    fatherMap.clear();
 
     Point tmp[4] = {Point(0,-1), Point(-1, 0), Point(0, 1), Point(1, 0)};
     srand(time(NULL));
 
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) { //如果在最短路径上有路，那么就返回最短路径
         if ((endPoint - startPoint) == tmp[i]) {
             if (game.SnakeMove(localSnake, tmp[i], false) >= 0) return i;
         }
     }
     int index = rand() % 4;
     float cost = 0;
-    qDebug() << "________" << Qt::endl;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) { //尝试走可行的，使得蛇的方差最短的路径
         if (game.SnakeMove(localSnake, tmp[i], false) >= 0) {
             pair<pair<float,float>,pair<float,float>> meanAndVariance = localSnake.GetMeanAndVariance(startPoint+tmp[i]);
             pair<float,float> mean = meanAndVariance.first, variance = meanAndVariance.second;
             float score = sqrt(variance.first * variance.first + variance.second * variance.second) / GetNorm(localSnake.GetBody().GetCurrentLength());
-            qDebug() << "score = " << score << Qt::endl;
-            if (score > cost) {
+            //qDebug() << "score = " << score << Qt::endl;
+            if (score > cost) { //找到使得方差最大的决策
                 cost = score;
                 index = i;
             }
         }
     }
-    qDebug() << "________" << Qt::endl;
-    return index;
+    return index; //返回决策0~4，分别对应上下左右
 }
-
-
-
-
-
-
-
-
-
-

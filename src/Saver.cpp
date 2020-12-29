@@ -31,6 +31,8 @@ void Saver::Save(int index, Game* gameAddr) {
         localSnake.SetDirection(firstSnake->data.GetDirection());
         localSnake.SetRefreshTime(firstSnake->data.GetRefreshTime());
         localSnake.SetTryDirection(firstSnake->data.GetTryDirection());
+        localSnake.SetAutoMove(firstSnake->data.GetAutoMove());
+        localSnake.SetScore(firstSnake->data.GetScore());
 
         while ((localSnake).GetBody().GetCurrentLength() != 0) (localSnake).GetBody().Delete();
         for (int i = 2; i <= firstSnake->data.GetBody().GetCurrentLength() + 1; ++i) {
@@ -62,6 +64,8 @@ void Saver::Load(int index, Game* gameAddr) {
         localSnake.SetDirection(firstSnake->data.GetDirection());
         localSnake.SetRefreshTime(firstSnake->data.GetRefreshTime());
         localSnake.SetTryDirection(firstSnake->data.GetTryDirection());
+        localSnake.SetAutoMove(firstSnake->data.GetAutoMove());
+        localSnake.SetScore(firstSnake->data.GetScore());
         while ((localSnake).GetBody().GetCurrentLength() != 0) (localSnake).GetBody().Delete();
         for (int i = 2; i <= firstSnake->data.GetBody().GetCurrentLength() + 1; ++i) {
             if (firstSnake->data.GetBody().Find(i) == NULL) break;

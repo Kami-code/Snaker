@@ -1,4 +1,3 @@
-#include <QSound>
 #include "header/GameWindow.h"
 #include "header/GameOverWindow.h"
 

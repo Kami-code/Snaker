@@ -23,6 +23,9 @@ public:
     Point move(Point movePos) {
         return Point(x + movePos.x, y + movePos.y);
     }
+    double GetDist(Point point) {
+        return sqrt((x - point.x) * (x - point.x) + (y - point.y) * (y - point.y));
+    }
     ostream& operator << (ostream &);
     Point operator + (const Point &) const;
     Point operator - (const Point &) const;

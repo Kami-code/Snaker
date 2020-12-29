@@ -20,7 +20,8 @@ public:
     void ChangeFigureSetting();
     void SetSnakes(int);
     void SetBackgroundSize(int);
-
+    void ChangeAISnakeSetting();
+    void ChangePenetrateSetting();
 signals:
     void SignalChangeToDesktop();
 
@@ -30,6 +31,8 @@ private:
     QPushButton * audioButton;
     QPushButton * figureButton;
     QPushButton * returnButton;
+    QPushButton * aiSnakeButton;
+    QPushButton * penetrateButton;
 
     QSlider * slider;
     QSlider * slider2;

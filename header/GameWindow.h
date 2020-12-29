@@ -110,7 +110,7 @@ public slots:
 
 private:
 
-    QPushButton * at,*bt, *ct;
+    QPushButton * stopButton,*returnButton, *saveButton;
     WindowMap windowMap;
     vector<QTimer*> timerVector;
     int timeCount = 0;

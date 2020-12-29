@@ -55,14 +55,12 @@
 #include "header/GameWindow.h"
 #include "header/DesktopWindow.h"
 
-Game game;
-Saver saver;
+Game game;          //创建当前游戏对象
+Saver saver;        //创建存档对象
 int main(int argc, char *argv[])
 {
-    Snake *a = new Snake(Point(3,3));
-    game.snakeList.Insert(*a);
     QApplication app(argc, argv);
-    MainWidget w;
-    w.show();
+    DesktopWindow desktopWindow;
+    desktopWindow.show();
     return app.exec();
 }

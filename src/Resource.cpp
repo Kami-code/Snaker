@@ -5,20 +5,28 @@
 
 extern Game game;
 
-void Resource::init() {
-    int tmp = min(12, maxSnake);
-    character = new QPixmap[tmp];
-    food = new QPixmap[tmp];
-    for (int i = 0; i < 12; ++i) {
+int Resource::GetFoodSize() {return foodSize;}
+int Resource::GetCharacterSize() {return characterSize;}
+void Resource::SetFoodSize(int number) {foodSize = number;}
+void Resource::SetCharacterSize(int number) {characterSize = number;}
+
+void Resource::LoadResourceFromExternal() {
+
+    character = new QPixmap[characterSize];
+    food = new QPixmap[foodSize];
+    for (int i = 0; i < characterSize; ++i) {
         QString s = ":/image/image/head" + QString::number(i) + ".png";
         character[i].load(s);
     }
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < foodSize; ++i) {
         QString s = ":/image/image/food" + QString::number(i) + ".png";
         food[i].load(s);
     }
+    wall.load(":/image/image/wall.png");
 }
 
 Resource::Resource(){
-    init();
+    SetFoodSize(5);
+    SetCharacterSize(12);
+    LoadResourceFromExternal();
 }

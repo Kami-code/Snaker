@@ -7,10 +7,17 @@
 #include "header/Game.h"
 
 class Resource{
+private:
+    int characterSize = 10;
+    int foodSize = 5;
 public:
-    QPixmap* character,* food;
-    void init();
+    QPixmap* character,* food, wall;
     Resource();
+    void SetCharacterSize(int);
+    void SetFoodSize(int);
+    int GetCharacterSize();
+    int GetFoodSize();
+    void LoadResourceFromExternal();
 };
 
 
